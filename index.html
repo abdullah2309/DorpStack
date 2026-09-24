@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DropStack — Open Source Alternatives to Popular Software</title>
+    <meta name="description" content="Discover the best open source alternatives to popular SaaS products. Ditch subscriptions and take back control of your data.">
+    <meta name="theme-color" id="metaTheme" content="#0a1310">
+    <link rel="icon" href="assets/logo/iconlogo.png">
+
+    <!-- Resolve saved theme BEFORE first paint (no flash) -->
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('oa-theme') || 'dark';
+                var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (t === 'dark' || (t === 'system' && sysDark)) document.documentElement.classList.add('dark');
+            } catch (e) { document.documentElement.classList.add('dark'); }
+        })();
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Geist typeface (Vercel's design system font) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Geist', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+                    },
+                    colors: {
+                        background: 'var(--background)',
+                        card: 'var(--card)',
+                        popover: 'var(--popover)',
+                        border: 'var(--border)',
+                        primary: 'var(--foreground)',
+                        secondary: 'var(--secondary)',
+                        accent: 'var(--accent)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ============ DropStack theme tokens (brand green) ============ */
+        :root {
+            --background: #ffffff;
+            --card: #f8fbf9;
+            --popover: #ffffff;
+            --border: #dfe9e2;
+            --foreground: #0f1c13;
+            --secondary: #5b6f63;
+            --accent: #00a751;
+            --accent-hover: #009045;
+            --grid-line: rgba(0, 167, 81, .06);
+            --geist-shadow: 0 1px 2px rgba(15,28,19,.05), 0 8px 24px rgba(15,28,19,.09), 0 0 0 1px rgba(15,28,19,.05);
+        }
+        .dark {
+            --background: #0a1310;
+            --card: #0e1a14;
+            --popover: #101d17;
+            --border: #223829;
+            --foreground: #e9f3ec;
+            --secondary: #8ea798;
+            --accent: #2bd46a;
+            --accent-hover: #27bf60;
+            --grid-line: rgba(43, 212, 106, .05);
+            --geist-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 8px 24px rgba(0,0,0,.6);
+        }
+
+        /* ============ Base ============ */
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+        html.dark { color-scheme: dark; }
+        html:not(.dark) { color-scheme: light; }
+        html *, html ::before, html ::after { border-color: var(--border); }
+        body { background: var(--background); color: var(--foreground); }
+        button { cursor: pointer; }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        input:focus-visible { outline: none; }
+        ::selection { background: var(--accent); color: #06130b; }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; border: 3px solid var(--background); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+        .no-scrollbar { scrollbar-width: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* Smooth cross-fade when switching themes */
+        .theme-anim, .theme-anim *, .theme-anim *::before, .theme-anim *::after {
+            transition: background-color .35s ease, border-color .35s ease, color .35s ease, fill .35s ease, box-shadow .35s ease !important;
+        }
+
+        /* ============ Hero grid background ============ */
+        .grid-bg {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 44px 44px;
+            -webkit-mask-image: radial-gradient(ellipse 65% 70% at 50% 0%, black 30%, transparent 75%);
+            mask-image: radial-gradient(ellipse 65% 70% at 50% 0%, black 30%, transparent 75%);
+        }
+
+        /* ============ Header ============ */
+        .site-header {
+            background: color-mix(in srgb, var(--background) 82%, transparent);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .nav-link {
+            padding: 6px 10px; border-radius: 8px; color: var(--secondary);
+            transition: color .15s ease, background-color .15s ease;
+        }
+        .nav-link:hover { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+        .icon-btn {
+            height: 32px; width: 32px; display: grid; place-items: center; flex: none;
+            border-radius: 8px; border: 1px solid var(--border); color: var(--secondary);
+            transition: all .15s ease;
+        }
+        .icon-btn:hover { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+        .icon-btn:active { transform: scale(.95); }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            height: 32px; padding: 0 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+            transition: all .15s ease; white-space: nowrap;
+        }
+        .btn:active { transform: scale(.97); }
+        .btn-solid { background: var(--foreground); color: var(--background); border: 1px solid var(--foreground); }
+        .btn-solid:hover { opacity: .88; }
+        .btn-outline { border: 1px solid var(--border); color: var(--foreground); }
+        .btn-outline:hover { background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+
+        /* ============ Theme dropdown (moon icon) ============ */
+        .theme-menu {
+            position: absolute; right: 0; top: calc(100% + 8px); width: 176px; z-index: 60;
+            background: var(--popover); border: 1px solid var(--border); border-radius: 12px; padding: 6px;
+            box-shadow: var(--geist-shadow);
+            opacity: 0; transform: scale(.96) translateY(-4px); pointer-events: none;
+            transform-origin: top right;
+            transition: opacity .16s ease, transform .16s ease;
+        }
+        .theme-wrap.menu-open .theme-menu { opacity: 1; transform: none; pointer-events: auto; }
+        .theme-option {
+            display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 10px;
+            border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--secondary);
+            text-align: left; transition: background-color .12s ease, color .12s ease;
+        }
+        .theme-option:hover { background: color-mix(in srgb, var(--foreground) 6%, transparent); color: var(--foreground); }
+        .theme-option[aria-selected="true"] { color: var(--foreground); }
+        .theme-option .check { margin-left: auto; opacity: 0; transition: opacity .15s ease; }
+        .theme-option[aria-selected="true"] .check { opacity: 1; }
+
+        /* ============ Search ============ */
+        .search-input {
+            width: 100%; height: 46px; border-radius: 10px; border: 1px solid var(--border);
+            background: var(--card); color: var(--foreground); font-size: 14px; padding: 0 44px 0 42px;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+        .search-input::placeholder { color: var(--secondary); }
+        .search-input:focus {
+            outline: none;
+            border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+        }
+        .clear-btn {
+            position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+            height: 26px; width: 26px; display: grid; place-items: center; border-radius: 6px;
+            color: var(--secondary); transition: all .15s ease;
+        }
+        .clear-btn:hover { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 6%, transparent); }
+        .hint-off { display: none !important; }
+
+        /* ============ Stats ============ */
+        .stat-num { font-family: "Geist Mono", monospace; font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+        .stat-label { font-size: 11.5px; color: var(--secondary); margin-top: 3px; }
+
+        /* ============ Category pills + scroller arrows ============ */
+        .pill {
+            flex: none; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border);
+            font-size: 13px; font-weight: 500; color: var(--secondary); white-space: nowrap;
+            background: transparent; transition: all .15s ease;
+        }
+        .pill:hover { color: var(--foreground); border-color: color-mix(in srgb, var(--foreground) 30%, var(--border)); }
+        .pill.active { background: var(--foreground); color: var(--background); border-color: var(--foreground); }
+        .pill-arrow {
+            flex: none; height: 33px; width: 33px; display: grid; place-items: center;
+            border-radius: 999px; border: 1px solid var(--border); color: var(--secondary); background: transparent;
+            transition: opacity .18s ease, transform .18s ease, color .15s ease, background-color .15s ease, border-color .15s ease;
+        }
+        .pill-arrow:hover { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+        .pill-arrow:active { transform: scale(.92); }
+        .pill-arrow-off { opacity: 0; pointer-events: none; transform: scale(.8); }
+
+        /* ============ Tabs ============ */
+        .tab {
+            position: relative; padding: 10px 14px; font-size: 13.5px; font-weight: 500;
+            color: var(--secondary); white-space: nowrap; transition: color .15s ease;
+        }
+        .tab:hover { color: var(--foreground); }
+        .tab::after {
+            content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px;
+            border-radius: 2px; background: var(--foreground);
+            transform: scaleX(0); transition: transform .22s cubic-bezier(.22,.61,.36,1);
+        }
+        .tab.active { color: var(--foreground); }
+        .tab.active::after { transform: scaleX(1); }
+
+        /* ============ Cards ============ */
+        .card-item {
+            background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+            animation: riseIn .4s cubic-bezier(.22,.61,.36,1) both;
+            transition: border-color .16s ease, background-color .16s ease;
+        }
+        .card-item:hover { border-color: color-mix(in srgb, var(--foreground) 24%, var(--border)); }
+        .no-anim .card-item { animation: none; }
+        @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+        .tile {
+            width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; flex: none;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .09);
+        }
+        .dark .tile { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); }
+        @media (min-width: 640px) { .tile { width: 48px; height: 48px; } }
+        .mini-tile {
+            width: 15px; height: 15px; border-radius: 4px; display: inline-grid; place-items: center;
+            font-size: 9px; font-weight: 700; flex: none;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .1);
+        }
+        .dark .mini-tile { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16); }
+
+        .vote-btn {
+            display: inline-flex; align-items: center; gap: 5px; flex: none;
+            padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border);
+            color: var(--secondary); font-size: 12px; font-weight: 600;
+            font-family: "Geist Mono", monospace; background: transparent; transition: all .15s ease;
+        }
+        .vote-btn:hover {
+            color: var(--foreground); border-color: color-mix(in srgb, var(--foreground) 25%, var(--border));
+            background: color-mix(in srgb, var(--foreground) 4%, transparent);
+        }
+        .vote-btn svg { transition: transform .15s ease; }
+        .vote-btn:hover svg { transform: translateY(-1px); }
+        .vote-btn.is-voted { background: var(--accent); border-color: var(--accent); color: #06130b; }
+        .vote-btn.is-voted:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+        .vote-btn.is-voted svg { fill: currentColor; }
+
+        .pricing-badge {
+            font-size: 10px; font-weight: 500; line-height: 1; padding: 3px 7px;
+            border-radius: 999px; border: 1px solid var(--border); color: var(--secondary); white-space: nowrap;
+        }
+        .license-chip {
+            display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--secondary);
+            border: 1px solid var(--border); border-radius: 6px; padding: 2.5px 6px; white-space: nowrap;
+            font-family: "Geist Mono", monospace;
+        }
+        .ad-pill {
+            font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+            color: var(--secondary); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; line-height: 1;
+        }
+        .topic {
+            font-family: "Geist Mono", monospace; font-size: 11px; color: var(--secondary);
+            transition: color .12s ease;
+        }
+        .topic:hover { color: var(--accent); }
+
+        .show-more {
+            display: flex; align-items: center; gap: 8px; margin: 0 auto; padding: 9px 22px;
+            border-radius: 999px; border: 1px solid var(--border); font-size: 13.5px; font-weight: 500;
+            color: var(--foreground); transition: all .15s ease;
+        }
+        .show-more:hover { background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+        .show-more.hidden { display: none; }
+
+        .hover-surface { transition: background-color .15s ease, color .15s ease, border-color .15s ease; }
+        .hover-surface:hover { background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+
+        /* ============ News sidebar ============ */
+        .news-tile {
+            width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; flex: none;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .09);
+        }
+        .dark .news-tile { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14); }
+        .news-input {
+            height: 32px; min-width: 0; flex: 1 1 0%; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--background); color: var(--foreground); font-size: 12.5px; padding: 0 10px;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+        .news-input::placeholder { color: var(--secondary); }
+        .news-input:focus {
+            outline: none;
+            border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+        }
+
+        /* ============ Sponsors & footer ============ */
+        .sponsor-cell {
+            display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center;
+            padding: 20px 12px; color: var(--secondary); font-weight: 600; font-size: 13px;
+            letter-spacing: -.01em; transition: background-color .15s ease, color .15s ease;
+        }
+        .sponsor-cell:hover { background: color-mix(in srgb, var(--foreground) 4%, transparent); color: var(--foreground); }
+        .foot-link { color: var(--secondary); font-size: 13px; transition: color .15s ease; }
+        .foot-link:hover { color: var(--foreground); }
+
+        /* Mobile menu replays its entrance each time it opens */
+        .mobile-menu:not(.hidden) { animation: riseIn .18s ease both; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .card-item, .mobile-menu { animation: none !important; }
+            html { scroll-behavior: auto; }
+        }
+    </style>
+</head>
+
+<body class="bg-background text-primary font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- ================= Header ================= -->
+    <header class="site-header sticky top-0 z-40 w-full border-b border-border">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+            <div class="flex h-16 items-center justify-between gap-3">
+                <!-- Left: logo + nav -->
+                <div class="flex items-center gap-7">
+                    <a href="#" class="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight">
+                        <img src="assets/logo/logo-main-light.png" alt="DropStack logo" class="h-6 w-auto dark:hidden">
+                        <img src="assets/logo/logo-main-dark.png" alt="DropStack logo" class="hidden h-6 w-auto dark:block">
+                    </a>
+                    <nav class="hidden md:flex items-center gap-0.5 text-sm font-medium">
+                        <a href="#alternatives" class="nav-link">Alternatives</a>
+                        <a href="#categories" class="nav-link">Categories</a>
+                        <a href="#about" class="nav-link">About</a>
+                    </nav>
+                </div>
+
+                <!-- Right: actions -->
+                <div class="flex items-center gap-2">
+                    <button id="headerSearch" class="icon-btn" aria-label="Search alternatives">
+                        <span><i data-lucide="search" class="w-4 h-4"></i></span>
+                    </button>
+                    <a href="https://github.com/piotrkulpinski/openalternative" target="_blank" rel="noopener"
+                       class="btn btn-outline hidden sm:inline-flex" title="Star DropStack on GitHub">
+                        <span><i data-lucide="github" class="w-4 h-4"></i></span>
+                        <span class="font-mono text-xs font-medium">4.2k</span>
+                    </a>
+
+                    <!-- Theme dropdown (moon icon) -->
+                    <div class="theme-wrap relative" id="themeWrap">
+                        <button id="themeBtn" class="icon-btn" aria-label="Change theme" aria-haspopup="listbox" aria-expanded="false">
+                            <span id="tiSun" class="hidden"><i data-lucide="sun" class="w-4 h-4"></i></span>
+                            <span id="tiMoon"><i data-lucide="moon" class="w-4 h-4"></i></span>
+                            <span id="tiMonitor" class="hidden"><i data-lucide="monitor" class="w-4 h-4"></i></span>
+                        </button>
+                        <div class="theme-menu" id="themeMenu" role="listbox" aria-label="Appearance">
+                            <p class="px-2.5 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wider text-secondary">Appearance</p>
+                            <button class="theme-option" role="option" data-set-theme="light" aria-selected="false">
+                                <span><i data-lucide="sun" class="w-4 h-4"></i></span> Light
+                                <span class="check"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                            </button>
+                            <button class="theme-option" role="option" data-set-theme="dark" aria-selected="false">
+                                <span><i data-lucide="moon" class="w-4 h-4"></i></span> Dark
+                                <span class="check"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                            </button>
+                            <button class="theme-option" role="option" data-set-theme="system" aria-selected="false">
+                                <span><i data-lucide="monitor" class="w-4 h-4"></i></span> System
+                                <span class="check"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <a href="#" class="btn btn-outline hidden md:inline-flex">Sign In</a>
+                    <a href="#" class="btn btn-solid">Submit</a>
+                    <button id="menuBtn" class="icon-btn md:hidden" aria-label="Toggle menu">
+                        <span id="miMenu"><i data-lucide="menu" class="w-4 h-4"></i></span>
+                        <span id="miClose" class="hidden"><i data-lucide="x" class="w-4 h-4"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="mobile-menu hidden border-t border-border md:hidden">
+            <nav class="mx-auto flex max-w-6xl flex-col gap-0.5 px-4 py-3 text-sm font-medium">
+                <a href="#alternatives" class="nav-link">Alternatives</a>
+                <a href="#categories" class="nav-link">Categories</a>
+                <a href="#about" class="nav-link">About</a>
+                <div class="flex gap-2 pb-1 pt-2.5">
+                    <a href="#" class="btn btn-outline flex-1">Sign In</a>
+                    <a href="#" class="btn btn-solid flex-1">Submit</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1">
+
+        <!-- ================= Hero ================= -->
+        <section class="relative overflow-hidden">
+            <div class="grid-bg pointer-events-none" aria-hidden="true"></div>
+
+            <div class="relative mx-auto max-w-3xl px-4 pb-16 pt-20 text-center sm:pt-24">
+                <a href="#" class="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-secondary transition-colors hover:border-accent hover:text-primary">
+                    <i data-lucide="rocket" class="w-3.5 h-3.5"></i> Built with Astro
+                </a>
+
+                <h1 class="mt-7 text-[38px] font-bold leading-[1.06] tracking-[-0.03em] sm:text-[54px]">
+                    Open Source Alternatives<br class="hidden sm:block"> to Popular Software
+                </h1>
+
+                <p class="mx-auto mt-5 max-w-xl text-[15px] leading-relaxed text-secondary sm:text-base">
+                    Over 1 million users replaced their proprietary tools with open source software.
+                    Discover the best alternatives, ditch the subscriptions, and take back control of your data.
+                </p>
+
+                <!-- Search -->
+                <div class="relative mx-auto mt-9 w-full max-w-xl">
+                    <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-secondary">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                    </span>
+                    <input id="searchInput" type="text" autocomplete="off" spellcheck="false"
+                           class="search-input"
+                           placeholder="Search alternatives — try &quot;Notion&quot;, &quot;Firebase&quot; or &quot;analytics&quot;"
+                           aria-label="Search alternatives">
+                    <kbd id="kbdHint" class="pointer-events-none absolute right-3.5 top-1/2 hidden h-5 min-w-[20px] -translate-y-1/2 items-center justify-center rounded border border-border bg-card px-1.5 font-mono text-[10px] text-secondary sm:flex">/</kbd>
+                    <button id="clearBtn" class="clear-btn hidden" aria-label="Clear search">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="mt-12 flex items-center justify-center gap-8 sm:gap-14">
+                    <div>
+                        <div class="stat-num text-primary" data-target="1000000" data-suffix="+">0</div>
+                        <div class="stat-label">Users switched</div>
+                    </div>
+                    <div class="h-9 w-px bg-border"></div>
+                    <div>
+                        <div class="stat-num text-primary" data-target="2400" data-suffix="+">0</div>
+                        <div class="stat-label">Alternatives listed</div>
+                    </div>
+                    <div class="h-9 w-px bg-border"></div>
+                    <div>
+                        <div class="stat-num text-primary" data-target="300" data-suffix="+">0</div>
+                        <div class="stat-label">SaaS tools covered</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= Directory: alternatives (left) + news sidebar (right) ================= -->
+        <section class="mx-auto max-w-6xl px-4 sm:px-6">
+            <div class="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
+
+                <!-- ===== Main column: alternatives (cards design unchanged) ===== -->
+                <div id="alternatives" class="min-w-0">
+
+                    <!-- Category pills with scroll arrows -->
+                    <div id="categories" class="flex items-center gap-2">
+                        <button id="pillPrev" class="pill-arrow" aria-label="Scroll categories left">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <div id="pillScroller" class="no-scrollbar flex flex-1 gap-2 overflow-x-auto">
+                            <button class="pill active" data-cat="all">All</button>
+                            <button class="pill" data-cat="productivity">Productivity</button>
+                            <button class="pill" data-cat="developer-tools">Developer Tools</button>
+                            <button class="pill" data-cat="analytics">Analytics</button>
+                            <button class="pill" data-cat="marketing">Marketing</button>
+                            <button class="pill" data-cat="design">Design</button>
+                            <button class="pill" data-cat="databases">Databases</button>
+                            <button class="pill" data-cat="cms">CMS</button>
+                            <button class="pill" data-cat="communication">Communication</button>
+                        </div>
+                        <button id="pillNext" class="pill-arrow" aria-label="Scroll categories right">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Tabs + result count -->
+                    <div class="mt-6 flex flex-wrap items-end justify-between gap-x-4 border-b border-border">
+                        <div class="flex">
+                            <button class="tab active" data-tab="latest">Latest</button>
+                            <button class="tab" data-tab="popular">Popular</button>
+                            <button class="tab" data-tab="trending">Trending</button>
+                        </div>
+                        <p id="resultCount" class="pb-2.5 font-mono text-[11px] text-secondary" aria-live="polite"></p>
+                    </div>
+
+                    <!-- Cards (rendered by JS) -->
+                    <div id="list" class="mt-5 flex flex-col gap-3.5"></div>
+
+                    <!-- Show more -->
+                    <div class="mt-7 flex justify-center">
+                        <button id="showMoreBtn" class="show-more">
+                            <span id="showMoreLabel">Show more</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ===== Sidebar: News ===== -->
+                <aside class="min-w-0">
+                    <div class="flex flex-col gap-6 lg:sticky lg:top-20">
+
+                        <!-- News list -->
+                        <div>
+                            <div class="flex items-center justify-between border-b border-border pb-3">
+                                <h2 class="flex items-center gap-2 text-sm font-semibold text-primary">
+                                    <i data-lucide="newspaper" class="w-4 h-4 text-accent"></i>
+                                    News
+                                </h2>
+                                <a href="#" class="inline-flex items-center gap-1 text-xs font-medium text-secondary transition-colors hover:text-primary">
+                                    View all <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                </a>
+                            </div>
+                            <div id="newsList"></div>
+                        </div>
+
+                        <!-- Follow on X card -->
+                        <a href="#" class="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-accent">
+                            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg" style="background:var(--foreground);color:var(--background)">
+                                <i data-lucide="twitter" class="w-4 h-4"></i>
+                            </span>
+                            <span class="min-w-0 flex-1">
+                                <span class="block text-[13px] font-semibold text-primary">Follow @dropstack</span>
+                                <span class="mt-0.5 block text-[11px] leading-snug text-secondary">Newest alternatives, straight in your feed.</span>
+                            </span>
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 shrink-0 text-secondary transition-colors group-hover:text-accent"></i>
+                        </a>
+
+                        <!-- Newsletter card -->
+                        <div class="rounded-xl border border-border bg-card p-5">
+                            <div class="flex items-center gap-2.5">
+                                <span class="grid h-7 w-7 place-items-center rounded-md border border-border text-accent">
+                                    <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                                </span>
+                                <h3 class="text-sm font-semibold text-primary">Open Source Weekly</h3>
+                            </div>
+                            <p class="mt-2.5 text-xs leading-relaxed text-secondary">
+                                The best new alternatives and open source news, delivered to your inbox every week. No spam, unsubscribe anytime.
+                            </p>
+                            <form id="newsForm" class="mt-3.5 flex gap-2">
+                                <input id="newsEmail" type="email" required placeholder="you@example.com" class="news-input" aria-label="Email address">
+                                <button type="submit" class="btn btn-solid shrink-0">Join</button>
+                            </form>
+                            <p id="newsFormMsg" class="mt-2.5 hidden text-xs font-medium text-accent">Thanks! You're on the list.</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- ================= Sponsors ================= -->
+        <section class="mt-20 border-t border-border">
+            <div class="mx-auto max-w-6xl px-4 py-12 text-center">
+                <p class="text-xs text-secondary">DropStack is supported by these incredible partners and sponsors</p>
+                <a href="#" class="mt-1.5 inline-block text-xs font-medium text-secondary underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary">Advertise with us</a>
+
+                <div class="mt-8 grid grid-cols-2 overflow-hidden rounded-xl border-t border-l border-border md:grid-cols-5">
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="codepen" class="w-4 h-4"></i><span>CodeRabbit</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="plane" class="w-4 h-4"></i><span>Openlane</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="aperture" class="w-4 h-4"></i><span>capture.page</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="send" class="w-4 h-4"></i><span>Sent</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="database" class="w-4 h-4"></i><span>influxdata</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="file-text" class="w-4 h-4"></i><span>Docmost</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="code" class="w-4 h-4"></i><span>c15t</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="camera" class="w-4 h-4"></i><span>ScreenshotOne</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="file-box" class="w-4 h-4"></i><span>postiz</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="wind" class="w-4 h-4"></i><span>Windshift</span></a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= Footer ================= -->
+    <footer id="about" class="border-t border-border">
+        <div class="mx-auto max-w-6xl px-4 py-14">
+            <div class="flex flex-col gap-10 md:flex-row md:justify-between">
+                <div class="max-w-xs">
+                    <a href="#" class="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight">
+                        <img src="assets/logo/logo-main-light.png" alt="DropStack logo" class="h-6 w-auto dark:hidden">
+                        <img src="assets/logo/logo-main-dark.png" alt="DropStack logo" class="hidden h-6 w-auto dark:block">
+                    </a>
+                    <p class="mt-4 text-[13px] leading-relaxed text-secondary">
+                        Discover open source alternatives to popular SaaS products. Ditch subscriptions, own your data, and support the open source movement.
+                    </p>
+                    <div class="mt-5 flex gap-2">
+                        <a href="#" class="icon-btn" aria-label="X (Twitter)"><span><i data-lucide="twitter" class="w-4 h-4"></i></span></a>
+                        <a href="https://github.com/piotrkulpinski/openalternative" target="_blank" rel="noopener" class="icon-btn" aria-label="GitHub"><span><i data-lucide="github" class="w-4 h-4"></i></span></a>
+                        <a href="#" class="icon-btn" aria-label="Mastodon"><span><i data-lucide="mastodon" class="w-4 h-4"></i></span></a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-x-14 gap-y-8 sm:grid-cols-3">
+                    <div>
+                        <h4 class="text-[11px] font-semibold uppercase tracking-wider text-secondary">Explore</h4>
+                        <ul class="mt-3.5 space-y-2.5">
+                            <li><a class="foot-link" href="#alternatives">Alternatives</a></li>
+                            <li><a class="foot-link" href="#categories">Categories</a></li>
+                            <li><a class="foot-link" href="#">Submit a tool</a></li>
+                            <li><a class="foot-link" href="#">Sponsors</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-[11px] font-semibold uppercase tracking-wider text-secondary">Resources</h4>
+                        <ul class="mt-3.5 space-y-2.5">
+                            <li><a class="foot-link" href="#">About</a></li>
+                            <li><a class="foot-link" href="#">Blog</a></li>
+                            <li><a class="foot-link" href="#">FAQ</a></li>
+                            <li><a class="foot-link" href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-[11px] font-semibold uppercase tracking-wider text-secondary">Community</h4>
+                        <ul class="mt-3.5 space-y-2.5">
+                            <li><a class="foot-link" href="https://github.com/piotrkulpinski/openalternative" target="_blank" rel="noopener">GitHub</a></li>
+                            <li><a class="foot-link" href="#">X (Twitter)</a></li>
+                            <li><a class="foot-link" href="#">Mastodon</a></li>
+                            <li><a class="foot-link" href="#">RSS</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-secondary sm:flex-row">
+                <p>© 2025 DropStack. All listings belong to their respective owners.</p>
+                <p class="flex items-center gap-1.5">Made with <i data-lucide="heart" class="w-3 h-3 text-accent"></i> by the open source community</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= Floating ad (dismissible) ================= -->
+    <aside id="floatAd" class="geist-shadow fixed bottom-5 right-5 z-30 hidden w-[calc(100vw-2.5rem)] max-w-xs rounded-xl border border-border bg-popover p-4 lg:block">
+        <button id="floatAdClose" aria-label="Dismiss ad"
+                class="absolute right-2.5 top-2.5 grid h-6 w-6 place-items-center rounded-md text-secondary transition-colors hover:text-primary">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+        <div class="flex gap-3 pr-6">
+            <div class="tile !h-9 !w-9" style="background:#18181b;color:#ffffff">
+                <i data-lucide="camera" class="h-[18px] w-[18px]"></i>
+            </div>
+            <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-semibold text-primary">ScreenshotOne</span>
+                    <span class="ad-pill">Ad</span>
+                </div>
+                <p class="mt-1.5 text-xs leading-relaxed text-secondary">Capture pixel-perfect screenshots of any website with a simple API. Trusted by 3,000+ developers.</p>
+                <a href="#" class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary underline decoration-border underline-offset-4 transition-colors hover:decoration-primary">
+                    Learn more <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        (function () {
+            'use strict';
+
+            /* ================= Data ================= */
+            const PRODUCTS = [
+                { name: 'Supabase', pricing: 'Freemium', license: 'Apache-2.0', categories: ['developer-tools', 'databases'],
+                  description: 'The open source Firebase alternative. Supabase gives you a fully managed Postgres database, authentication, instant APIs, edge functions, realtime subscriptions and file storage.',
+                  topics: ['database', 'backend', 'auth', 'developer-tools'],
+                  votes: 1243, comments: 58, views: '96.4k', trending: 92, added: '2024-11-18',
+                  logo: { bg: '#3ecf8e', fg: '#03251a', icon: 'zap' },
+                  altTo: [{ name: 'Firebase', bg: '#ffa000', fg: '#ffffff' }] },
+
+                { name: 'Godot Engine', pricing: 'Open Source', license: 'MIT', categories: ['developer-tools'],
+                  description: 'Godot Engine is a feature-packed, cross-platform game engine to create 2D and 3D games from a unified interface. Completely free and open source, no strings attached.',
+                  topics: ['gamedev', 'game-development', 'cross-platform', 'engine'],
+                  votes: 1108, comments: 41, views: '58.2k', trending: 89, added: '2024-11-02',
+                  logo: { bg: '#478cbf', fg: '#ffffff', icon: 'gamepad-2' },
+                  altTo: [{ name: 'Unity', bg: '#2d2d2d', fg: '#ffffff' }] },
+
+                { name: 'AppFlowy', pricing: 'Freemium', license: 'AGPL-3.0', categories: ['productivity'],
+                  description: 'AppFlowy is an AI collaborative workspace where you achieve more without losing your data privacy. Built with Flutter and Rust, the best Notion alternative for teams.',
+                  topics: ['note-taking', 'knowledge-management', 'wiki', 'ai'],
+                  votes: 982, comments: 47, views: '41.7k', trending: 84, added: '2024-09-30',
+                  logo: { bg: '#f3c23d', fg: '#3b2c00', icon: 'notebook-pen' },
+                  altTo: [{ name: 'Notion', bg: '#191919', fg: '#ffffff' }] },
+
+                { name: 'Plausible', pricing: 'Freemium', license: 'AGPL-3.0', categories: ['analytics'],
+                  description: 'Plausible is a lightweight and open source web analytics tool. Simple, privacy-friendly, cookie-free analytics that does not slow down your site or your visitors.',
+                  topics: ['analytics', 'web-analytics', 'privacy', 'seo'],
+                  votes: 845, comments: 36, views: '38.9k', trending: 74, added: '2024-09-12',
+                  logo: { bg: '#2ab3a6', fg: '#ffffff', icon: 'bar-chart-3' },
+                  altTo: [{ name: 'Google Analytics', bg: '#e37400', fg: '#ffffff' }] },
+
+                { name: 'Cal.com', pricing: 'Freemium', license: 'AGPL-3.0', categories: ['productivity'],
+                  description: 'Cal.com is open-source scheduling infrastructure for everyone. Book meetings without the back-and-forth emails, fully white-label and API-first.',
+                  topics: ['scheduling', 'calendar', 'booking', 'api'],
+                  votes: 761, comments: 29, views: '31.3k', trending: 86, added: '2024-10-28',
+                  logo: { bg: '#1c1c1f', fg: '#ffffff', icon: 'calendar' },
+                  altTo: [{ name: 'Calendly', bg: '#006bff', fg: '#ffffff' }] },
+
+                { name: 'Excalidraw', pricing: 'Open Source', license: 'MIT', categories: ['design'],
+                  description: 'Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them. Collaborate and share with your team.',
+                  topics: ['whiteboard', 'diagrams', 'drawing', 'collaboration'],
+                  votes: 723, comments: 25, views: '44.6k', trending: 68, added: '2024-08-10',
+                  logo: { bg: '#6965db', fg: '#ffffff', icon: 'pencil' },
+                  altTo: [{ name: 'Miro', bg: '#ffd02f', fg: '#3a2e00' }] },
+
+                { name: 'n8n', pricing: 'Freemium', license: 'Fair-code', categories: ['developer-tools'],
+                  description: 'n8n is a fair-code licensed workflow automation tool with native AI capabilities. Connect anything to everything and build custom integrations visually.',
+                  topics: ['automation', 'workflows', 'integrations', 'no-code'],
+                  votes: 690, comments: 33, views: '52.1k', trending: 81, added: '2024-10-15',
+                  logo: { bg: '#ea4b71', fg: '#ffffff', icon: 'workflow' },
+                  altTo: [{ name: 'Zapier', bg: '#ff4f00', fg: '#ffffff' }] },
+
+                { name: 'Ghost', pricing: 'Freemium', license: 'MIT', categories: ['cms', 'marketing'],
+                  description: 'Ghost is a powerful app for creators to publish, share, and grow a business around their content. The best newsletter platform and Substack alternative.',
+                  topics: ['blogging', 'newsletter', 'cms', 'publishing'],
+                  votes: 611, comments: 22, views: '29.8k', trending: 70, added: '2024-08-27',
+                  logo: { bg: '#e9e9ee', fg: '#15171a', icon: 'ghost' },
+                  altTo: [{ name: 'Substack', bg: '#ff6719', fg: '#ffffff' }] },
+
+                { name: 'Postiz', pricing: 'Open Source', license: 'AGPL-3.0', categories: ['marketing'],
+                  description: 'Postiz is the ultimate open-source social media scheduling tool. Schedule posts, analyze performance and manage all your social accounts from one place.',
+                  topics: ['social-media', 'scheduling', 'marketing', 'ai'],
+                  votes: 578, comments: 19, views: '18.6k', trending: 98, added: '2024-12-22',
+                  logo: { bg: '#b4e34a', fg: '#1f2900', icon: 'send' },
+                  altTo: [{ name: 'Buffer', bg: '#2f2f33', fg: '#ffffff' }] },
+
+                { name: 'Listmonk', pricing: 'Open Source', license: 'AGPL-3.0', categories: ['marketing'],
+                  description: 'Listmonk is a high performance, self-hosted newsletter and mailing list manager with a modern dashboard. One binary, one config file, zero dependencies.',
+                  topics: ['newsletter', 'email-marketing', 'mailing-list', 'self-hosted'],
+                  votes: 495, comments: 14, views: '15.2k', trending: 64, added: '2024-07-05',
+                  logo: { bg: '#e8604c', fg: '#ffffff', icon: 'mail' },
+                  altTo: [{ name: 'Mailchimp', bg: '#ffe01b', fg: '#241f00' }] },
+
+                { name: 'Docmost', pricing: 'Open Source', license: 'AGPL-3.0', categories: ['productivity'],
+                  description: 'Docmost is an open-source collaborative wiki and documentation software. Real-time collaboration, permissions, spaces and comments for your team knowledge.',
+                  topics: ['wiki', 'knowledge-management', 'documentation', 'collaboration'],
+                  votes: 431, comments: 12, views: '9.8k', trending: 95, added: '2025-01-12',
+                  logo: { bg: '#2f6fed', fg: '#ffffff', icon: 'book-open' },
+                  altTo: [{ name: 'Notion', bg: '#191919', fg: '#ffffff' }, { name: 'Confluence', bg: '#172b4d', fg: '#ffffff' }] },
+
+                { name: 'Baserow', pricing: 'Freemium', license: 'MIT', categories: ['databases'],
+                  description: 'Baserow is an open source no-code database and Airtable alternative. Create your own online database without any technical experience.',
+                  topics: ['database', 'no-code', 'spreadsheet', 'airtable'],
+                  votes: 389, comments: 11, views: '12.4k', trending: 66, added: '2024-11-25',
+                  logo: { bg: '#45c481', fg: '#06281a', icon: 'table-2' },
+                  altTo: [{ name: 'Airtable', bg: '#fcb400', fg: '#332700' }] },
+
+                { name: 'Appwrite', pricing: 'Open Source', license: 'BSD-3', categories: ['developer-tools'],
+                  description: 'Appwrite is a self-hosted backend platform providing REST APIs for auth, databases, storage and functions. Build your next app 10x faster.',
+                  topics: ['backend', 'database', 'auth', 'serverless'],
+                  votes: 372, comments: 16, views: '14.9k', trending: 62, added: '2024-07-28',
+                  logo: { bg: '#fd3667', fg: '#ffffff', icon: 'server' },
+                  altTo: [{ name: 'Firebase', bg: '#ffa000', fg: '#ffffff' }] },
+
+                { name: 'Chatwoot', pricing: 'Open Source', license: 'MIT', categories: ['communication'],
+                  description: 'Chatwoot gives you all the tools to manage conversations and build relationships with your customers. The open source Intercom alternative for live chat.',
+                  topics: ['live-chat', 'customer-support', 'crm', 'helpdesk'],
+                  votes: 331, comments: 9, views: '11.3k', trending: 72, added: '2024-12-01',
+                  logo: { bg: '#1e90e6', fg: '#ffffff', icon: 'message-circle' },
+                  altTo: [{ name: 'Intercom', bg: '#3b5bdb', fg: '#ffffff' }] },
+
+                { name: 'Umami', pricing: 'Open Source', license: 'MIT', categories: ['analytics'],
+                  description: 'Umami is a simple, fast, privacy-focused alternative to Google Analytics. It collects only the metrics you need and keeps your visitors data yours.',
+                  topics: ['analytics', 'web-analytics', 'privacy', 'self-hosted'],
+                  votes: 305, comments: 8, views: '10.1k', trending: 78, added: '2024-12-15',
+                  logo: { bg: '#e8e8eb', fg: '#17171b', icon: 'pie-chart' },
+                  altTo: [{ name: 'Google Analytics', bg: '#e37400', fg: '#ffffff' }] },
+
+                { name: 'Typebot', pricing: 'Open Source', license: 'FSL', categories: ['productivity'],
+                  description: 'Typebot gives you powerful blocks to create unique chat experiences. The open source conversational form builder and Typeform alternative.',
+                  topics: ['forms', 'chatbot', 'conversational', 'typeform'],
+                  votes: 266, comments: 7, views: '7.4k', trending: 76, added: '2025-01-05',
+                  logo: { bg: '#4f46e5', fg: '#ffffff', icon: 'bot' },
+                  altTo: [{ name: 'Typeform', bg: '#262627', fg: '#ffffff' }] }
+            ];
+
+            const ADS = [
+                { title: 'CodeRabbit', bg: '#7b2fbe', fg: '#ffffff', icon: 'rabbit',
+                  text: 'The leading AI code review platform. Ship better quality code in 50% less time, with 90% fewer bugs.' },
+                { title: 'c15t', bg: 'var(--accent)', fg: '#06130b', icon: 'cookie',
+                  text: 'Open-source cookie consent, built for control and lightning-fast modern web apps.' }
+            ];
+
+            const NEWS = [
+                { title: 'Supabase launches Realtime Broadcast and Presence for multiplayer apps', source: 'Supabase', time: '2d ago', icon: 'zap', bg: '#3ecf8e', fg: '#03251a' },
+                { title: 'Godot 4.4 is out: physics interpolation, embedded games and more', source: 'Godot', time: '5d ago', icon: 'gamepad-2', bg: '#478cbf', fg: '#ffffff' },
+                { title: 'Postiz raises $2M seed to take on Buffer and Hootsuite', source: 'Postiz', time: '1w ago', icon: 'send', bg: '#b4e34a', fg: '#1f2900' },
+                { title: 'n8n crosses 100k stars on GitHub as AI workflows boom', source: 'n8n', time: '1w ago', icon: 'workflow', bg: '#ea4b71', fg: '#ffffff' },
+                { title: 'Umami Cloud adds funnel and retention reports, still cookie-free', source: 'Umami', time: '2w ago', icon: 'pie-chart', bg: '#e8e8eb', fg: '#17171b' },
+                { title: 'Excalidraw introduces embeds and Mermaid diagram conversion', source: 'Excalidraw', time: '2w ago', icon: 'pencil', bg: '#6965db', fg: '#ffffff' }
+            ];
+
+            /* ================= Helpers ================= */
+            const $ = (id) => document.getElementById(id);
+            const fmt = (n) => n.toLocaleString('en-US');
+            const store = {
+                get(k, f) { try { return localStorage.getItem(k) ?? f; } catch (e) { return f; } },
+                set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+            };
+            const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            /* ================= State ================= */
+            const PAGE = 8;
+            const state = { tab: 'latest', category: 'all', query: '', limit: PAGE };
+            const voted = new Set(JSON.parse(store.get('oa-votes', '[]') || '[]'));
+            const effectiveVotes = (p) => p.votes + (voted.has(p.name) ? 1 : 0);
+
+            /* ================= Theme (moon icon dropdown) ================= */
+            const themeWrap = $('themeWrap'), themeBtn = $('themeBtn'), metaTheme = $('metaTheme');
+            const tiSun = $('tiSun'), tiMoon = $('tiMoon'), tiMonitor = $('tiMonitor');
+            let themeMode = store.get('oa-theme', 'dark');
+            if (!['light', 'dark', 'system'].includes(themeMode)) themeMode = 'dark';
+            let animTimer;
+
+            const prefersDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            function syncThemeButton() {
+                tiSun.classList.toggle('hidden', themeMode !== 'light');
+                tiMoon.classList.toggle('hidden', themeMode !== 'dark');
+                tiMonitor.classList.toggle('hidden', themeMode !== 'system');
+            }
+
+            function applyTheme(animate) {
+                const dark = themeMode === 'dark' || (themeMode === 'system' && prefersDark());
+                const root = document.documentElement;
+                if (animate !== false) {
+                    root.classList.add('theme-anim');
+                    clearTimeout(animTimer);
+                    animTimer = setTimeout(() => root.classList.remove('theme-anim'), 400);
+                }
+                root.classList.toggle('dark', dark);
+                metaTheme.setAttribute('content', dark ? '#0a1310' : '#ffffff');
+                syncThemeButton();
+                document.querySelectorAll('[data-set-theme]').forEach(b =>
+                    b.setAttribute('aria-selected', String(b.dataset.setTheme === themeMode)));
+            }
+
+            function closeThemeMenu() {
+                themeWrap.classList.remove('menu-open');
+                themeBtn.setAttribute('aria-expanded', 'false');
+            }
+
+            themeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const open = themeWrap.classList.toggle('menu-open');
+                themeBtn.setAttribute('aria-expanded', String(open));
+            });
+
+            document.querySelectorAll('[data-set-theme]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    themeMode = btn.dataset.setTheme;
+                    store.set('oa-theme', themeMode);
+                    applyTheme();
+                    closeThemeMenu();
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!themeWrap.contains(e.target)) closeThemeMenu();
+            });
+
+            // React to OS preference changes while in "System" mode
+            const mql = window.matchMedia('(prefers-color-scheme: dark)');
+            const onSys = () => { if (themeMode === 'system') applyTheme(); };
+            if (mql.addEventListener) mql.addEventListener('change', onSys);
+            else if (mql.addListener) mql.addListener(onSys);
+
+            /* ================= Rendering: alternatives ================= */
+            const listEl = $('list'), resultCount = $('resultCount');
+            const showMoreBtn = $('showMoreBtn'), showMoreLabel = $('showMoreLabel');
+
+            function productCard(p, i, animate) {
+                const delay = animate ? Math.min(i * 35, 280) : 0;
+                const isVoted = voted.has(p.name);
+                const alts = p.altTo.map(a => `
+                    <span class="inline-flex items-center gap-1">
+                        <span class="mini-tile" style="background:${a.bg};color:${a.fg}">${a.name.charAt(0)}</span>
+                        <span class="text-primary opacity-80">${a.name}</span>
+                    </span>`).join('<span class="opacity-40">,</span>');
+                const topics = p.topics.map(t => `<button class="topic" data-topic="${t}">#${t}</button>`).join('');
+
+                return `
+                <article class="card-item flex gap-4 p-4 sm:p-5" style="animation-delay:${delay}ms">
+                    <div class="tile shrink-0" style="background:${p.logo.bg};color:${p.logo.fg}">
+                        <i data-lucide="${p.logo.icon}" class="h-[22px] w-[22px]"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <h3 class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[15px] font-semibold leading-tight text-primary">
+                                    <span class="truncate">${p.name}</span>
+                                    <span class="pricing-badge">${p.pricing}</span>
+                                </h3>
+                                <p class="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-secondary">
+                                    <span>Open source alternative to</span>${alts}
+                                </p>
+                            </div>
+                            <button class="vote-btn ${isVoted ? 'is-voted' : ''}" data-vote="${p.name}" title="Upvote ${p.name}" aria-label="Upvote ${p.name}">
+                                <i data-lucide="caret-up" class="w-3.5 h-3.5"></i>
+                                <span class="vote-count">${fmt(effectiveVotes(p))}</span>
+                            </button>
+                        </div>
+                        <p class="mt-2.5 text-sm leading-relaxed text-secondary line-clamp-2">${p.description}</p>
+                        <div class="mt-3.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                            <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5">
+                                ${topics}
+                                <span class="license-chip"><i data-lucide="scale" class="w-3 h-3"></i>${p.license}</span>
+                            </div>
+                            <div class="flex shrink-0 items-center gap-3 text-xs text-secondary">
+                                <span class="inline-flex items-center gap-1.5"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i>${p.comments}</span>
+                                <span class="inline-flex items-center gap-1.5"><i data-lucide="eye" class="w-3.5 h-3.5"></i>${p.views}</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>`;
+            }
+
+            function adCard(ad) {
+                return `
+                <article class="card-item flex gap-4 p-4 sm:p-5">
+                    <div class="tile shrink-0" style="background:${ad.bg};color:${ad.fg}">
+                        <i data-lucide="${ad.icon}" class="h-[22px] w-[22px]"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-[15px] font-semibold leading-tight text-primary">${ad.title}</h3>
+                            <span class="ad-pill">Ad</span>
+                        </div>
+                        <p class="mt-2 text-sm leading-relaxed text-secondary">${ad.text}</p>
+                        <a href="#" class="mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-primary underline decoration-border underline-offset-4 transition-colors hover:decoration-primary">
+                            Learn more <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                        </a>
+                    </div>
+                </article>`;
+            }
+
+            const emptyState = `
+                <div class="rounded-xl border border-border bg-card px-6 py-16 text-center">
+                    <div class="mx-auto grid h-11 w-11 place-items-center rounded-full border border-border text-secondary">
+                        <i data-lucide="search-x" class="w-5 h-5"></i>
+                    </div>
+                    <p class="mt-4 text-sm font-medium text-primary">No alternatives found</p>
+                    <p class="mt-1 text-sm text-secondary">Try different keywords or clear the active filters.</p>
+                    <button data-clear class="mt-5 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium text-primary transition-colors hover-surface">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Clear filters
+                    </button>
+                </div>`;
+
+            const ctaCard = `
+                <article class="rounded-xl border border-dashed border-border p-6 text-center transition-colors hover:border-accent">
+                    <p class="text-sm text-secondary">Know a great open source alternative that is not listed here?</p>
+                    <a href="#" class="mt-3 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium text-primary transition-colors hover-surface">
+                        Submit an alternative <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                    </a>
+                </article>`;
+
+            function currentList() {
+                const q = state.query.trim().toLowerCase();
+                const list = PRODUCTS.filter(p => {
+                    if (state.category !== 'all' && !p.categories.includes(state.category)) return false;
+                    if (q) {
+                        const hay = [p.name, p.description, ...p.topics, ...p.categories, ...p.altTo.map(a => a.name)].join(' ').toLowerCase();
+                        if (!hay.includes(q)) return false;
+                    }
+                    return true;
+                });
+                const sorters = {
+                    latest: (a, b) => new Date(b.added) - new Date(a.added),
+                    popular: (a, b) => effectiveVotes(b) - effectiveVotes(a),
+                    trending: (a, b) => b.trending - a.trending
+                };
+                return list.sort(sorters[state.tab]);
+            }
+
+            function render(opts) {
+                const animate = !opts || opts.animate !== false;
+                const list = currentList();
+                const shown = list.slice(0, state.limit);
+                const parts = [];
+
+                shown.forEach((p, i) => {
+                    parts.push(productCard(p, i, animate));
+                    if (i === 3) parts.push(adCard(ADS[0]));
+                    if (i === 8) parts.push(adCard(ADS[1]));
+                });
+                if (shown.length === 0) parts.push(emptyState);
+                parts.push(ctaCard);
+
+                if (!animate) {
+                    listEl.classList.add('no-anim');
+                    requestAnimationFrame(() => requestAnimationFrame(() => listEl.classList.remove('no-anim')));
+                }
+                listEl.innerHTML = parts.join('');
+                if (window.lucide) lucide.createIcons();
+
+                const remaining = list.length - shown.length;
+                showMoreBtn.classList.toggle('hidden', remaining <= 0);
+                showMoreLabel.textContent = 'Show ' + remaining + ' more';
+
+                const q = state.query.trim();
+                let label;
+                if (!q && state.category === 'all' && list.length === PRODUCTS.length) {
+                    label = PRODUCTS.length + ' alternatives';
+                } else {
+                    label = list.length + (list.length === 1 ? ' result' : ' results') + (q ? ' for "' + q + '"' : '');
+                }
+                resultCount.textContent = label;
+            }
+
+            /* ================= Rendering: news sidebar ================= */
+            function renderNews() {
+                $('newsList').innerHTML = NEWS.map(n => `
+                    <a href="#" class="news-item group flex items-start gap-3 border-b border-border py-3 first:pt-2.5 last:border-b-0 last:pb-0">
+                        <span class="news-tile" style="background:${n.bg};color:${n.fg}">
+                            <i data-lucide="${n.icon}" class="h-[17px] w-[17px]"></i>
+                        </span>
+                        <span class="min-w-0 flex-1">
+                            <span class="line-clamp-2 block text-[13px] font-medium leading-snug text-primary transition-colors group-hover:text-accent">${n.title}</span>
+                            <span class="mt-1 flex items-center gap-1.5 font-mono text-[11px] text-secondary">
+                                <span class="shrink-0">${n.source}</span>
+                                <span class="opacity-50">&middot;</span>
+                                <span class="shrink-0">${n.time}</span>
+                            </span>
+                        </span>
+                        <i data-lucide="arrow-up-right" class="mt-0.5 h-3.5 w-3.5 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100"></i>
+                    </a>`).join('');
+            }
+
+            // Newsletter form
+            $('newsForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                $('newsForm').classList.add('hidden');
+                $('newsFormMsg').classList.remove('hidden');
+            });
+
+            /* ================= Upvotes ================= */
+            function toggleVote(name) {
+                const p = PRODUCTS.find(x => x.name === name);
+                if (!p) return;
+                if (voted.has(name)) voted.delete(name); else voted.add(name);
+                store.set('oa-votes', JSON.stringify([...voted]));
+                const btn = listEl.querySelector('[data-vote="' + CSS.escape(name) + '"]');
+                if (btn) {
+                    btn.classList.toggle('is-voted', voted.has(name));
+                    btn.querySelector('.vote-count').textContent = fmt(effectiveVotes(p));
+                }
+            }
+
+            /* ================= Category pills scroller (arrow buttons) ================= */
+            const pillScroller = $('pillScroller'), pillPrev = $('pillPrev'), pillNext = $('pillNext');
+
+            function syncPillArrows() {
+                const max = pillScroller.scrollWidth - pillScroller.clientWidth;
+                const hasOverflow = max > 8;
+                pillPrev.classList.toggle('pill-arrow-off', !hasOverflow || pillScroller.scrollLeft <= 8);
+                pillNext.classList.toggle('pill-arrow-off', !hasOverflow || pillScroller.scrollLeft >= max - 8);
+            }
+
+            pillPrev.addEventListener('click', () => pillScroller.scrollBy({ left: -260, behavior: 'smooth' }));
+            pillNext.addEventListener('click', () => pillScroller.scrollBy({ left: 260, behavior: 'smooth' }));
+            pillScroller.addEventListener('scroll', debounce(syncPillArrows, 60), { passive: true });
+            window.addEventListener('resize', debounce(syncPillArrows, 150));
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncPillArrows);
+            syncPillArrows();
+
+            /* ================= Filters & interactions ================= */
+            const searchInput = $('searchInput'), clearBtn = $('clearBtn'), kbdHint = $('kbdHint');
+
+            function syncPills() {
+                document.querySelectorAll('[data-cat]').forEach(b => b.classList.toggle('active', b.dataset.cat === state.category));
+            }
+            function syncTabs() {
+                document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === state.tab));
+            }
+            function syncSearchUI() {
+                clearBtn.classList.toggle('hidden', !searchInput.value);
+                kbdHint.classList.toggle('hint-off', !!searchInput.value);
+            }
+            function resetFilters() {
+                state.query = ''; state.category = 'all'; state.tab = 'latest'; state.limit = PAGE;
+                searchInput.value = '';
+                syncPills(); syncTabs(); syncSearchUI();
+                render();
+            }
+            function setSearch(q) {
+                state.query = q; searchInput.value = q; state.limit = PAGE;
+                syncSearchUI();
+                render({ animate: false });
+            }
+
+            document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+                state.tab = b.dataset.tab; state.limit = PAGE;
+                syncTabs(); render();
+            }));
+
+            document.querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => {
+                state.category = b.dataset.cat; state.limit = PAGE;
+                syncPills(); render();
+                // Keep the selected pill in view inside the scroller
+                b.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }));
+
+            searchInput.addEventListener('input', debounce(() => setSearch(searchInput.value), 180));
+
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') $('alternatives').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            clearBtn.addEventListener('click', () => { setSearch(''); searchInput.focus(); });
+
+            showMoreBtn.addEventListener('click', () => { state.limit += PAGE; render({ animate: false }); });
+
+            // Card interactions via delegation (votes, topic chips, clear filters)
+            listEl.addEventListener('click', (e) => {
+                const vote = e.target.closest('[data-vote]');
+                if (vote) { toggleVote(vote.dataset.vote); return; }
+                const topic = e.target.closest('[data-topic]');
+                if (topic) {
+                    setSearch(topic.dataset.topic);
+                    $('alternatives').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    return;
+                }
+                if (e.target.closest('[data-clear]')) resetFilters();
+            });
+
+            // Header search button -> focus the hero search
+            function focusSearch() {
+                searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => searchInput.focus({ preventScroll: true }), 350);
+            }
+            $('headerSearch').addEventListener('click', focusSearch);
+
+            /* ================= Keyboard shortcuts ================= */
+            const isTyping = () => {
+                const t = document.activeElement;
+                return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+            };
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { closeThemeMenu(); closeMobileMenu(); }
+                if (e.key === '/' && !isTyping()) { e.preventDefault(); focusSearch(); }
+            });
+
+            /* ================= Mobile menu ================= */
+            const mobileMenu = $('mobileMenu'), menuBtn = $('menuBtn'), miMenu = $('miMenu'), miClose = $('miClose');
+            function closeMobileMenu() {
+                mobileMenu.classList.add('hidden');
+                miMenu.classList.remove('hidden');
+                miClose.classList.add('hidden');
+            }
+            menuBtn.addEventListener('click', () => {
+                const open = !mobileMenu.classList.toggle('hidden');
+                miMenu.classList.toggle('hidden', open);
+                miClose.classList.toggle('hidden', !open);
+            });
+            mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobileMenu));
+
+            /* ================= Floating ad ================= */
+            $('floatAdClose').addEventListener('click', () => { $('floatAd').style.display = 'none'; });
+
+            /* ================= Hero stats count-up ================= */
+            function compact(n) {
+                const trim = (s) => s.replace(/\.0$/, '');
+                if (n >= 1e6) return trim((n / 1e6).toFixed(1)) + 'M';
+                if (n >= 1e3) return trim((n / 1e3).toFixed(1)) + 'K';
+                return String(n);
+            }
+            function animateStats() {
+                document.querySelectorAll('.stat-num').forEach(el => {
+                    const target = +el.dataset.target, suffix = el.dataset.suffix || '+';
+                    if (reduceMotion) { el.textContent = compact(target) + suffix; return; }
+                    const t0 = performance.now(), dur = 1100;
+                    (function tick(now) {
+                        const p = Math.min((now - t0) / dur, 1);
+                        const eased = 1 - Math.pow(1 - p, 3);
+                        el.textContent = compact(Math.round(target * eased)) + suffix;
+                        if (p < 1) requestAnimationFrame(tick);
+                    })(t0);
+                });
+            }
+
+            /* ================= Boot ================= */
+            applyTheme(false);
+            render();
+            renderNews();
+            animateStats();
+            if (window.lucide) lucide.createIcons();
+        })();
+    </script>
+</body>
+</html>
