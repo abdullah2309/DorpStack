@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Manager — DropStack</title>
+    <meta name="description" content="Manage alternatives, news and ads data.">
+    <meta name="theme-color" id="metaTheme" content="#0a1310">
+    <link rel="icon" href="assets/logo/logo-main-light.png">
+
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('oa-theme') || 'dark';
+                var sysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (t === 'dark' || (t === 'system' && sysDark)) document.documentElement.classList.add('dark');
+            } catch (e) { document.documentElement.classList.add('dark'); }
+        })();
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Geist', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+                    },
+                    colors: {
+                        background: 'var(--background)',
+                        card: 'var(--card)',
+                        popover: 'var(--popover)',
+                        border: 'var(--border)',
+                        primary: 'var(--foreground)',
+                        secondary: 'var(--secondary)',
+                        accent: 'var(--accent)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --background: #ffffff;
+            --card: #f8fbf9;
+            --popover: #ffffff;
+            --border: #dfe9e2;
+            --foreground: #0f1c13;
+            --secondary: #5b6f63;
+            --accent: #00a751;
+            --accent-hover: #009045;
+            --geist-shadow: 0 1px 2px rgba(15,28,19,.05), 0 8px 24px rgba(15,28,19,.09), 0 0 0 1px rgba(15,28,19,.05);
+        }
+        .dark {
+            --background: #0a1310;
+            --card: #0e1a14;
+            --popover: #101d17;
+            --border: #223829;
+            --foreground: #e9f3ec;
+            --secondary: #8ea798;
+            --accent: #2bd46a;
+            --accent-hover: #27bf60;
+            --geist-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 8px 24px rgba(0,0,0,.6);
+        }
+
+        html { scroll-behavior: smooth; }
+        html.dark { color-scheme: dark; }
+        html:not(.dark) { color-scheme: light; }
+        html *, html ::before, html ::after { border-color: var(--border); }
+        body { background: var(--background); color: var(--foreground); }
+        button { cursor: pointer; }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; }
+        ::selection { background: var(--accent); color: #06130b; }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; border: 3px solid var(--background); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+        .theme-anim, .theme-anim *, .theme-anim *::before, .theme-anim *::after {
+            transition: background-color .35s ease, border-color .35s ease, color .35s ease, box-shadow .35s ease !important;
+        }
+        .i-arrow-up-right { display: inline-block; transform: rotate(-45deg); }
+
+        .site-header {
+            background: color-mix(in srgb, var(--background) 82%, transparent);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        }
+        .nav-link {
+            padding: 6px 10px; border-radius: 8px; color: var(--secondary);
+            transition: color .15s ease, background-color .15s ease;
+        }
+        .nav-link:hover { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+        .nav-link.active { color: var(--foreground); font-weight: 600; }
+        .icon-btn {
+            height: 32px; width: 32px; display: grid; place-items: center; flex: none;
+            border-radius: 8px; border: 1px solid var(--border); color: var(--secondary); transition: all .15s ease;
+        }
+        .icon-btn:hover { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+        .icon-btn:active { transform: scale(.95); }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            height: 32px; padding: 0 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+            transition: all .15s ease; white-space: nowrap;
+        }
+        .btn:active { transform: scale(.97); }
+        .btn-solid { background: var(--foreground); color: var(--background); border: 1px solid var(--foreground); }
+        .btn-solid:hover { opacity: .88; }
+        .btn-outline { border: 1px solid var(--border); color: var(--foreground); }
+        .btn-outline:hover { background: color-mix(in srgb, var(--foreground) 5%, transparent); }
+        .btn-accent { background: var(--accent); color: #06130b; border: 1px solid var(--accent); font-weight: 600; }
+        .btn-accent:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+        .btn-danger { border: 1px solid color-mix(in srgb, #e5484d 45%, var(--border)); color: #e5484d; }
+        .btn-danger:hover { background: color-mix(in srgb, #e5484d 10%, transparent); }
+
+        .fs-pill {
+            display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px;
+            border-radius: 8px; border: 1px solid var(--border); font-size: 12px; font-weight: 600;
+            transition: all .15s ease; white-space: nowrap;
+        }
+        .fs-dot { width: 7px; height: 7px; border-radius: 99px; background: var(--secondary); flex: none; }
+        .fs-on { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+        .fs-on .fs-dot { background: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+        .fs-warn { color: #e5a13d; border-color: color-mix(in srgb, #e5a13d 45%, var(--border)); background: color-mix(in srgb, #e5a13d 8%, transparent); }
+        .fs-warn .fs-dot { background: #e5a13d; }
+        .fs-on:hover, .fs-warn:hover { opacity: .9; }
+
+        .theme-menu {
+            position: absolute; right: 0; top: calc(100% + 8px); width: 176px; z-index: 60;
+            background: var(--popover); border: 1px solid var(--border); border-radius: 12px; padding: 6px;
+            box-shadow: var(--geist-shadow);
+            opacity: 0; transform: scale(.96) translateY(-4px); pointer-events: none;
+            transform-origin: top right; transition: opacity .16s ease, transform .16s ease;
+        }
+        .theme-wrap.menu-open .theme-menu { opacity: 1; transform: none; pointer-events: auto; }
+        .theme-option {
+            display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 10px;
+            border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--secondary);
+            text-align: left; transition: background-color .12s ease, color .12s ease;
+        }
+        .theme-option:hover { background: color-mix(in srgb, var(--foreground) 6%, transparent); color: var(--foreground); }
+        .theme-option[aria-selected="true"] { color: var(--foreground); }
+        .theme-option .check { margin-left: auto; opacity: 0; transition: opacity .15s ease; }
+        .theme-option[aria-selected="true"] .check { opacity: 1; }
+
+        .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 15px 18px; }
+        .stat-num { font-family: "Geist Mono", monospace; font-size: 24px; font-weight: 600; letter-spacing: -.02em; }
+        .stat-label { font-size: 11px; color: var(--secondary); margin-top: 2px; }
+
+        .tab {
+            position: relative; padding: 10px 12px; font-size: 13.5px; font-weight: 500;
+            color: var(--secondary); white-space: nowrap; transition: color .15s ease;
+        }
+        .tab:hover { color: var(--foreground); }
+        .tab::after {
+            content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px;
+            border-radius: 2px; background: var(--foreground);
+            transform: scaleX(0); transition: transform .22s cubic-bezier(.22,.61,.36,1);
+        }
+        .tab.active { color: var(--foreground); }
+        .tab.active::after { transform: scaleX(1); }
+        .tab-count { margin-left: 6px; font-family: "Geist Mono", monospace; font-size: 10px; color: var(--secondary); }
+        .tab.active .tab-count { color: var(--accent); }
+
+        .inp, .sel {
+            height: 36px; width: 100%; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--background); color: var(--foreground); font-size: 13px; padding: 0 10px;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+        .sel { appearance: none; -webkit-appearance: none; padding-right: 30px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 10px center; cursor: pointer;
+        }
+        .ta {
+            width: 100%; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--background); color: var(--foreground); font-size: 13px;
+            padding: 8px 10px; min-height: 74px; line-height: 1.55; resize: vertical;
+            font-family: "Geist Mono", monospace; font-size: 12px;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+        .inp:focus, .sel:focus, .ta:focus {
+            border-color: color-mix(in srgb, var(--accent) 65%, var(--border));
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+        }
+        .inp::placeholder, .ta::placeholder { color: var(--secondary); }
+        .inp-color { height: 36px; width: 100%; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--background); padding: 3px; cursor: pointer; }
+        .lbl { display: block; font-size: 10.5px; font-weight: 600; color: var(--secondary);
+            text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; }
+        .lbl .req { color: var(--accent); }
+
+        .chip {
+            font-size: 12px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--border);
+            color: var(--secondary); background: transparent; transition: all .15s ease; white-space: nowrap;
+        }
+        .chip:hover { color: var(--foreground); border-color: color-mix(in srgb, var(--foreground) 30%, var(--border)); }
+        .chip-on { background: var(--accent); border-color: var(--accent); color: #06130b; font-weight: 600; }
+
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;
+            padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); cursor: pointer;
+            transition: all .15s ease; white-space: nowrap; user-select: none;
+        }
+        .badge-live { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+            background: color-mix(in srgb, var(--accent) 10%, transparent); }
+        .badge-live:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+        .badge-draft { color: var(--secondary); }
+        .badge-draft:hover { color: var(--foreground); }
+
+        .tile {
+            width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; flex: none;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,.09);
+        }
+        .dark .tile { box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .data-table th {
+            text-align: left; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
+            color: var(--secondary); font-weight: 600; padding: 10px 14px;
+            border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .data-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .data-table tbody tr { transition: background-color .12s ease; }
+        .data-table tbody tr:hover { background: color-mix(in srgb, var(--foreground) 3%, transparent); }
+        .data-table tbody tr:last-child td { border-bottom: 0; }
+        .mono { font-family: "Geist Mono", monospace; }
+        .row-btn {
+            height: 28px; width: 28px; display: inline-grid; place-items: center; border-radius: 7px;
+            color: var(--secondary); transition: all .15s ease; flex: none;
+        }
+        .row-btn:hover { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 7%, transparent); }
+        .row-btn.danger:hover { color: #e5484d; background: color-mix(in srgb, #e5484d 12%, transparent); }
+
+        .raw-line {
+            font-family: "Geist Mono", monospace; font-size: 11.5px; line-height: 1.8;
+            white-space: pre; color: var(--secondary); padding: 1px 4px; border-radius: 4px;
+            transition: color .12s ease, background-color .12s ease;
+        }
+        .raw-line:hover { color: var(--foreground); background: color-mix(in srgb, var(--foreground) 4%, transparent); }
+
+        .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 9px; padding: 3px; gap: 2px; }
+        .seg button {
+            height: 28px; padding: 0 12px; border-radius: 6px; font-size: 12.5px; font-weight: 500;
+            color: var(--secondary); transition: all .15s ease; white-space: nowrap;
+        }
+        .seg button:hover { color: var(--foreground); }
+        .seg button.on { background: var(--foreground); color: var(--background); }
+
+        .overlay {
+            position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.55);
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            display: grid; place-items: center; padding: 16px;
+            opacity: 0; pointer-events: none; transition: opacity .18s ease;
+        }
+        .overlay.open { opacity: 1; pointer-events: auto; }
+        .modal {
+            width: 100%; max-width: 620px; max-height: calc(100vh - 4rem); overflow-y: auto;
+            background: var(--popover); border: 1px solid var(--border); border-radius: 16px;
+            box-shadow: var(--geist-shadow);
+            transform: translateY(12px) scale(.98); transition: transform .18s ease;
+        }
+        .overlay.open .modal { transform: none; }
+        .modal-sm { max-width: 400px; }
+
+        .toast {
+            position: fixed; bottom: 20px; right: 20px; z-index: 100;
+            display: flex; align-items: center; gap: 10px;
+            background: var(--popover); border: 1px solid var(--border); border-radius: 10px;
+            padding: 10px 16px; font-size: 13px; font-weight: 500; box-shadow: var(--geist-shadow);
+            opacity: 0; transform: translateY(8px); transition: all .2s ease; pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
+        }
+    </style>
+</head>
+
+<body class="bg-background text-primary font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- ================= Header ================= -->
+    <header class="site-header sticky top-0 z-40 w-full border-b border-border">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+            <div class="flex h-16 items-center justify-between gap-3">
+                <div class="flex items-center gap-7">
+                    <a href="index.html" class="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight">
+                        <img src="assets/logo/logo-main-light.png" alt="DropStack logo" class="h-6 w-auto dark:hidden">
+                        <img src="assets/logo/logo-main-dark.png" alt="DropStack logo" class="hidden h-6 w-auto dark:block">
+                    </a>
+                    <nav class="hidden md:flex items-center gap-0.5 text-sm font-medium">
+                        <a href="index.html" class="nav-link">View Site</a>
+                        <a href="data.html" class="nav-link active">Data Manager</a>
+                    </nav>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <div class="theme-wrap relative" id="themeWrap">
+                        <button id="themeBtn" class="icon-btn" aria-label="Change theme" aria-haspopup="listbox" aria-expanded="false">
+                            <span id="tiSun" class="hidden"><i class="fa-solid fa-sun text-[15px]"></i></span>
+                            <span id="tiMoon"><i class="fa-solid fa-moon text-[15px]"></i></span>
+                            <span id="tiMonitor" class="hidden"><i class="fa-solid fa-desktop text-[15px]"></i></span>
+                        </button>
+                        <div class="theme-menu" id="themeMenu" role="listbox" aria-label="Appearance">
+                            <p class="px-2.5 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wider text-secondary">Appearance</p>
+                            <button class="theme-option" role="option" data-set-theme="light" aria-selected="false">
+                                <span><i class="fa-solid fa-sun text-[14px]"></i></span> Light
+                                <span class="check"><i class="fa-solid fa-check text-[12px]"></i></span>
+                            </button>
+                            <button class="theme-option" role="option" data-set-theme="dark" aria-selected="false">
+                                <span><i class="fa-solid fa-moon text-[14px]"></i></span> Dark
+                                <span class="check"><i class="fa-solid fa-check text-[12px]"></i></span>
+                            </button>
+                            <button class="theme-option" role="option" data-set-theme="system" aria-selected="false">
+                                <span><i class="fa-solid fa-desktop text-[14px]"></i></span> System
+                                <span class="check"><i class="fa-solid fa-check text-[12px]"></i></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="fsPill" class="fs-pill" title="Connect data files">
+                        <span class="fs-dot"></span><span id="fsPillText" class="hidden sm:inline">Connect files</span>
+                    </button>
+
+                    <button id="exportBtn" class="btn btn-outline hidden md:inline-flex" title="Download data file (fallback)">
+                        <i class="fa-solid fa-download text-[13px]"></i>
+                    </button>
+                    <button id="addBtn" class="btn btn-accent">
+                        <i class="fa-solid fa-plus text-[12px]"></i><span>Add Data</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+
+            <p class="mono text-[11px] text-secondary">index.html &nbsp;/&nbsp; data</p>
+            <div class="mt-1 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-[28px] font-bold tracking-[-0.02em] sm:text-[32px]">Data Manager</h1>
+                    <p class="mt-1.5 text-sm text-secondary">Alternatives, news aur ads data — add, edit, delete. Changes <span class="font-medium text-primary">seedha data files me save</span> hote hain.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="dirtyBadge" class="badge badge-draft !cursor-default hidden">
+                        <i class="fa-solid fa-clock-rotate-left text-[10px]"></i> Unsaved (local)
+                    </span>
+                    <button id="resetBtn" class="btn btn-outline" title="Restore data files content">
+                        <i class="fa-solid fa-rotate-left text-[12px]"></i><span class="hidden sm:inline">Restore</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="modeNote" class="mt-6 flex items-start gap-3 rounded-xl border border-border bg-card p-4 text-[13px] text-secondary"></div>
+
+            <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div class="stat-card">
+                    <div class="stat-num text-primary" id="stTotal">0</div>
+                    <div class="stat-label">Total records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num" style="color:var(--accent)" id="stLive">0</div>
+                    <div class="stat-label" id="stLiveLabel">Live</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num text-primary" id="stDraft">0</div>
+                    <div class="stat-label">Drafts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-num text-primary" id="stExtra">—</div>
+                    <div class="stat-label" id="stExtraLabel">Last added</div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-wrap items-end justify-between gap-x-4 border-b border-border">
+                <div class="flex">
+                    <button class="tab active" data-tab="alternatives">Alternatives<span class="tab-count" id="cntAlts">0</span></button>
+                    <button class="tab" data-tab="news">News<span class="tab-count" id="cntNews">0</span></button>
+                    <button class="tab" data-tab="ads">Ads<span class="tab-count" id="cntAds">0</span></button>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 pb-2">
+                    <div class="relative">
+                        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-secondary">
+                            <i class="fa-solid fa-magnifying-glass text-[13px]"></i>
+                        </span>
+                        <input id="searchInput" type="text" autocomplete="off" spellcheck="false"
+                               class="inp !h-[34px] w-44 pl-9 sm:w-60" placeholder="Search records… /" aria-label="Search records">
+                    </div>
+                    <select id="statusFilter" class="sel !h-[34px] w-32" aria-label="Filter by status">
+                        <option value="all">All status</option>
+                        <option value="live">Live</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                    <div class="seg" role="group" aria-label="View mode">
+                        <button id="viewTable" class="on" title="Table view"><i class="fa-solid fa-table-list text-[12px]"></i></button>
+                        <button id="viewRaw" title="Raw JSON lines view"><i class="fa-solid fa-code text-[12px]"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tableView" class="mt-5 overflow-x-auto rounded-xl border border-border bg-card">
+                <table class="data-table">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="rawView" class="mt-5 hidden">
+                <div class="mb-2 flex items-center justify-between">
+                    <p class="mono text-[11px] text-secondary"><span id="rawCount">0</span> records — one JSON per line</p>
+                    <button id="copyRawBtn" class="btn btn-outline !h-[30px] text-xs">
+                        <i class="fa-regular fa-copy text-[12px]"></i> Copy lines
+                    </button>
+                </div>
+                <div class="max-h-[560px] overflow-auto rounded-xl border border-border bg-card p-4" id="rawBody"></div>
+            </div>
+
+            <p id="rowCount" class="mt-4 text-center mono text-[11px] text-secondary" aria-live="polite"></p>
+        </div>
+    </main>
+
+    <footer class="border-t border-border">
+        <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-secondary sm:flex-row">
+            <p>© 2025 DropStack — Data Manager</p>
+            <a href="index.html" class="inline-flex items-center gap-1.5 transition-colors hover:text-primary">
+                <i class="fa-solid fa-arrow-right i-arrow-up-right text-[11px]"></i> Back to site
+            </a>
+        </div>
+    </footer>
+
+    <!-- Add / Edit modal -->
+    <div class="overlay" id="formOverlay">
+        <div class="modal">
+            <div class="flex items-center justify-between border-b border-border px-6 py-4">
+                <div>
+                    <h2 class="text-[15px] font-semibold" id="formTitle">Add record</h2>
+                    <p class="mt-0.5 mono text-[11px] text-secondary" id="formSub">new record</p>
+                </div>
+                <button id="formClose" class="icon-btn" aria-label="Close">
+                    <i class="fa-solid fa-xmark text-[15px]"></i>
+                </button>
+            </div>
+            <form id="recForm" class="px-6 py-5" novalidate>
+                <div class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2" id="formBody"></div>
+                <div class="mt-6 flex items-center justify-end gap-2 border-t border-border pt-5">
+                    <button type="button" id="formCancel" class="btn btn-outline">Cancel</button>
+                    <button type="submit" class="btn btn-accent">
+                        <i class="fa-solid fa-check text-[12px]"></i> Save &amp; write to file
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm modal -->
+    <div class="overlay" id="confirmOverlay">
+        <div class="modal modal-sm">
+            <div class="px-6 py-6">
+                <div class="flex items-start gap-3.5">
+                    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg"
+                          style="background:color-mix(in srgb,#e5484d 12%,transparent);color:#e5484d">
+                        <i class="fa-solid fa-triangle-exclamation text-[16px]"></i>
+                    </span>
+                    <div>
+                        <h2 class="text-[15px] font-semibold" id="confirmTitle">Delete record?</h2>
+                        <p class="mt-1.5 text-[13px] leading-relaxed text-secondary" id="confirmMsg">This action cannot be undone.</p>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-2">
+                    <button id="confirmNo" class="btn btn-outline">Cancel</button>
+                    <button id="confirmYes" class="btn btn-danger">
+                        <i class="fa-solid fa-trash text-[12px]"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><i class="fa-solid fa-check text-[13px]" style="color:var(--accent)"></i><span id="toastMsg">Saved</span></div>
+
+    <!-- Data files -->
+    <script src="data/alternatives.js"></script>
+    <script src="data/news.js"></script>
+
+    <script>
+        (function () {
+            'use strict';
+
+            /* ============================================================
+               HELPERS — sabse pehle (TDZ fix: '$' pehle define hota hai)
+               ============================================================ */
+            const $ = (id) => document.getElementById(id);
+            const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            const fmt = (n) => Number(n || 0).toLocaleString('en-US');
+            const pad = (n) => String(n).padStart(2, '0');
+            const nowStr = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); };
+            const todayStr = () => nowStr().slice(0, 10);
+            const genId = () => (Date.now().toString(16) + Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).slice(0, 13);
+            const shortDate = (s) => (s || '').slice(0, 10);
+            const deep = (v) => JSON.parse(JSON.stringify(v));
+
+            const LS = { alts: 'ds-edit-alternatives', news: 'ds-edit-news' };
+            const loadLS = (k) => { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } };
+            const saveLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+            const clearLS = (k) => { try { localStorage.removeItem(k); } catch (e) {} };
+
+            const state = { tab: 'alternatives', q: '', status: 'all', view: 'table' };
+            let editingId = null;
+            let toastTimer;
+
+            /* ================= Toast ================= */
+            function toast(msg, icon) {
+                $('toastMsg').textContent = msg;
+                $('toast').firstElementChild.className = (icon || 'fa-solid fa-check') + ' text-[13px]';
+                $('toast').firstElementChild.style.color = 'var(--accent)';
+                $('toast').classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => $('toast').classList.remove('show'), 2400);
+            }
+
+            /* ================= Data sources ================= */
+            const DATA_LOADED = {
+                alts: !!window.ALTERNATIVES_DATA,
+                news: !!window.NEWS_DATA
+            };
+            const FILE = {
+                alternatives: deep(window.ALTERNATIVES_DATA || { products: [], ads: [] }),
+                news: deep(window.NEWS_DATA || [])
+            };
+            let DB = {
+                alternatives: loadLS(LS.alts) || deep(FILE.alternatives),
+                news: loadLS(LS.news) || deep(FILE.news)
+            };
+
+            const CATS = ['productivity', 'developer-tools', 'analytics', 'marketing', 'design', 'databases', 'cms', 'communication'];
+
+            /* ================= Theme (moon icon dropdown) ================= */
+            const themeWrap = $('themeWrap'), themeBtn = $('themeBtn'), metaTheme = $('metaTheme');
+            const tiSun = $('tiSun'), tiMoon = $('tiMoon'), tiMonitor = $('tiMonitor');
+            let themeMode = localStorage.getItem('oa-theme') || 'dark';
+            if (!['light', 'dark', 'system'].includes(themeMode)) themeMode = 'dark';
+            let animTimer;
+            const prefersDark = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            function syncThemeButton() {
+                tiSun.classList.toggle('hidden', themeMode !== 'light');
+                tiMoon.classList.toggle('hidden', themeMode !== 'dark');
+                tiMonitor.classList.toggle('hidden', themeMode !== 'system');
+            }
+            function applyTheme(animate) {
+                const dark = themeMode === 'dark' || (themeMode === 'system' && prefersDark());
+                const root = document.documentElement;
+                if (animate !== false) {
+                    root.classList.add('theme-anim');
+                    clearTimeout(animTimer);
+                    animTimer = setTimeout(() => root.classList.remove('theme-anim'), 400);
+                }
+                root.classList.toggle('dark', dark);
+                metaTheme.setAttribute('content', dark ? '#0a1310' : '#ffffff');
+                syncThemeButton();
+                document.querySelectorAll('[data-set-theme]').forEach(b =>
+                    b.setAttribute('aria-selected', String(b.dataset.setTheme === themeMode)));
+            }
+            function closeThemeMenu() {
+                themeWrap.classList.remove('menu-open');
+                themeBtn.setAttribute('aria-expanded', 'false');
+            }
+            themeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const open = themeWrap.classList.toggle('menu-open');
+                themeBtn.setAttribute('aria-expanded', String(open));
+            });
+            document.querySelectorAll('[data-set-theme]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    themeMode = btn.dataset.setTheme;
+                    try { localStorage.setItem('oa-theme', themeMode); } catch (e) {}
+                    applyTheme();
+                    closeThemeMenu();
+                });
+            });
+            document.addEventListener('click', (e) => { if (!themeWrap.contains(e.target)) closeThemeMenu(); });
+            const mql = window.matchMedia('(prefers-color-scheme: dark)');
+            const onSys = () => { if (themeMode === 'system') applyTheme(); };
+            if (mql.addEventListener) mql.addEventListener('change', onSys);
+            else if (mql.addListener) mql.addListener(onSys);
+
+            /* ============================================================
+               FILE SYSTEM ACCESS — direct write in data/*.js files
+               ============================================================ */
+            const FSA_SUPPORTED = 'showOpenFilePicker' in window;
+            let fileHandles = { alternatives: null, news: null };
+            let fsState = FSA_SUPPORTED ? 'off' : 'unsupported';
+            let fsLastSaved = null;
+            let writeChain = Promise.resolve();
+
+            const idb = {
+                _db: null,
+                open() {
+                    if (this._db) return Promise.resolve(this._db);
+                    return new Promise((res, rej) => {
+                        const r = indexedDB.open('dropstack-data', 1);
+                        r.onupgradeneeded = () => r.result.createObjectStore('handles');
+                        r.onsuccess = () => { this._db = r.result; res(this._db); };
+                        r.onerror = () => rej(r.error);
+                    });
+                },
+                set(k, v) { return this.open().then(db => new Promise((res, rej) => {
+                    const t = db.transaction('handles', 'readwrite');
+                    t.objectStore('handles').put(v, k);
+                    t.oncomplete = res; t.onerror = () => rej(t.error);
+                })); },
+                get(k) { return this.open().then(db => new Promise((res, rej) => {
+                    const t = db.transaction('handles', 'readonly');
+                    const rq = t.objectStore('handles').get(k);
+                    rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error);
+                })); }
+            };
+
+            function buildAlternativesFile() {
+                const p = DB.alternatives.products.map(r => JSON.stringify(r));
+                const a = DB.alternatives.ads.map(r => JSON.stringify(r));
+                return `/* ============================================================\n   DropStack — Alternatives & Ads data (saved ${nowStr()})\n   File: data/alternatives.js\n   Managed via data.html — one JSON record per line\n   ============================================================ */\n\nwindow.ALTERNATIVES_DATA = {\n\n    "products": [\n        ${p.join(',\n        ')}\n    ],\n\n    "ads": [\n        ${a.join(',\n        ')}\n    ]\n};\n`;
+            }
+            function buildNewsFile() {
+                const lines = DB.news.map(r => JSON.stringify(r));
+                return `/* ============================================================\n   DropStack — News data (saved ${nowStr()})\n   File: data/news.js\n   Managed via data.html — one JSON record per line\n   ============================================================ */\n\nwindow.NEWS_DATA = [\n    ${lines.join(',\n    ')}\n];\n`;
+            }
+
+            function parseDataFile(text) {
+                const fake = {};
+                try { new Function('window', text)(fake); } catch (e) {}
+                return fake;
+            }
+
+            async function connectFiles() {
+                if (!FSA_SUPPORTED) {
+                    toast('Is browser me direct file edit nahi hota — Export .js use karo', 'fa-solid fa-triangle-exclamation');
+                    return;
+                }
+                try {
+                    const picked = await window.showOpenFilePicker({
+                        multiple: true,
+                        types: [{ description: 'DropStack data files (.js)', accept: { 'text/javascript': ['.js'] } }]
+                    });
+                    let gotAlts = false, gotNews = false;
+                    for (const h of picked) {
+                        const name = (h.name || '').toLowerCase();
+                        if (name.includes('news')) { fileHandles.news = h; gotNews = true; }
+                        else { fileHandles.alternatives = h; gotAlts = true; }
+                    }
+                    if (gotAlts) await idb.set('h-alts', fileHandles.alternatives);
+                    if (gotNews) await idb.set('h-news', fileHandles.news);
+                    if (!gotAlts && !gotNews) {
+                        toast('alternatives.js ya news.js select karo', 'fa-solid fa-triangle-exclamation');
+                        return;
+                    }
+                    fsState = 'on';
+                    await readFromDisk();
+                    clearLS(LS.alts); clearLS(LS.news);
+                    $('dirtyBadge').classList.add('hidden');
+                    syncModeUI(); renderAll();
+                    toast('Files connected — ab har change seedha file me save hoga');
+                } catch (e) {
+                    if (e && e.name !== 'AbortError') toast('File connect fail: ' + e.message, 'fa-solid fa-triangle-exclamation');
+                }
+            }
+
+            async function readFromDisk() {
+                try {
+                    if (fileHandles.alternatives) {
+                        const f = await fileHandles.alternatives.getFile();
+                        const txt = await f.text();
+                        if (txt.trim()) {
+                            const fake = parseDataFile(txt);
+                            if (fake.ALTERNATIVES_DATA) DB.alternatives = deep(fake.ALTERNATIVES_DATA);
+                        }
+                    }
+                    if (fileHandles.news) {
+                        const f = await fileHandles.news.getFile();
+                        const txt = await f.text();
+                        if (txt.trim()) {
+                            const fake = parseDataFile(txt);
+                            if (fake.NEWS_DATA) DB.news = deep(fake.NEWS_DATA);
+                        }
+                    }
+                } catch (e) { /* ignore */ }
+            }
+
+            async function restoreHandles() {
+                if (!FSA_SUPPORTED) { syncModeUI(); return; }
+                try {
+                    fileHandles.alternatives = (await idb.get('h-alts')) || null;
+                    fileHandles.news = (await idb.get('h-news')) || null;
+                    if (!fileHandles.alternatives && !fileHandles.news) { fsState = 'off'; syncModeUI(); return; }
+                    let needPerm = false;
+                    for (const h of [fileHandles.alternatives, fileHandles.news]) {
+                        if (!h) continue;
+                        let p = 'granted';
+                        if (h.queryPermission) p = await h.queryPermission({ mode: 'readwrite' });
+                        if (p !== 'granted') needPerm = true;
+                    }
+                    if (needPerm) { fsState = 'reconnect'; syncModeUI(); return; }
+                    fsState = 'on';
+                    await readFromDisk();
+                    syncModeUI(); renderAll();
+                } catch (e) { fsState = 'off'; syncModeUI(); }
+            }
+
+            async function reconnect() {
+                try {
+                    for (const h of [fileHandles.alternatives, fileHandles.news]) {
+                        if (!h) continue;
+                        const p = await h.requestPermission({ mode: 'readwrite' });
+                        if (p !== 'granted') { toast('Permission denied', 'fa-solid fa-triangle-exclamation'); return; }
+                    }
+                    fsState = 'on';
+                    await readFromDisk();
+                    syncModeUI(); renderAll();
+                    toast('Reconnected — file sync ON');
+                } catch (e) { toast('Reconnect fail: ' + e.message, 'fa-solid fa-triangle-exclamation'); }
+            }
+
+            function writeToDisk() {
+                if (fsState !== 'on') return Promise.resolve(false);
+                writeChain = writeChain.then(async () => {
+                    const jobs = [];
+                    if (fileHandles.alternatives) {
+                        jobs.push(fileHandles.alternatives.createWritable().then(w => w.write(buildAlternativesFile()).then(() => w.close())));
+                    }
+                    if (fileHandles.news) {
+                        jobs.push(fileHandles.news.createWritable().then(w => w.write(buildNewsFile()).then(() => w.close())));
+                    }
+                    await Promise.all(jobs);
+                    fsLastSaved = nowStr().slice(11);
+                    $('dirtyBadge').classList.add('hidden');
+                    syncModeUI();
+                    return true;
+                }).catch((e) => {
+                    fsState = 'reconnect';
+                    syncModeUI();
+                    toast('File write fail — Reconnect par click karo', 'fa-solid fa-triangle-exclamation');
+                    return false;
+                });
+                return writeChain;
+            }
+
+            function syncModeUI() {
+                const pill = $('fsPill'), txt = $('fsPillText');
+                pill.classList.remove('fs-on', 'fs-warn');
+                if (fsState === 'on') {
+                    pill.classList.add('fs-on');
+                    txt.textContent = 'File sync ON';
+                    pill.title = 'data files me directly save ho raha hai';
+                } else if (fsState === 'reconnect') {
+                    pill.classList.add('fs-warn');
+                    txt.textContent = 'Reconnect';
+                    pill.title = 'Permission dobara grant karo (reload ke baad ek click)';
+                } else if (fsState === 'unsupported') {
+                    txt.textContent = 'Local only';
+                    pill.title = 'Is browser me File System Access nahi hai — Export .js fallback';
+                } else {
+                    txt.textContent = 'Connect files';
+                    pill.title = 'data/alternatives.js + data/news.js connect karo';
+                }
+
+                const note = $('modeNote');
+                if (fsState === 'on') {
+                    note.innerHTML = `
+                        <i class="fa-solid fa-circle-check mt-0.5 text-[14px]" style="color:var(--accent)"></i>
+                        <p class="leading-relaxed">
+                            <span class="font-semibold text-primary">Direct file write ON</span> — har add/edit/delete
+                            <span class="mono text-primary">data/alternatives.js</span> aur <span class="mono text-primary">data/news.js</span> me turant save hota hai
+                            (ek line = ek JSON record). ${fsLastSaved ? 'Last write: <span class="mono">' + fsLastSaved + '</span>.' : ''}
+                            Homepage <span class="font-medium text-primary">refresh</span> karo to naya data wahan bhi dikhega.
+                        </p>`;
+                } else if (fsState === 'reconnect') {
+                    note.innerHTML = `
+                        <i class="fa-solid fa-plug-circle-exclamation mt-0.5 text-[14px]" style="color:#e5a13d"></i>
+                        <p class="leading-relaxed">
+                            Files connected thi, reload ke baad permission dobara chahiye — upar <span class="font-medium text-primary">Reconnect</span> par click karo.
+                            Tab tak changes browser me save hote hain.
+                        </p>`;
+                } else if (fsState === 'unsupported') {
+                    note.innerHTML = `
+                        <i class="fa-solid fa-circle-info mt-0.5 text-[14px] text-accent"></i>
+                        <p class="leading-relaxed">
+                            Ye browser direct file edit support nahi karta. Chrome/Edge desktop use karo, ya
+                            <span class="font-medium text-primary">Export .js</span> se downloaded file se <span class="mono">data/</span> folder ki file manually replace karo.
+                        </p>`;
+                } else {
+                    note.innerHTML = `
+                        <i class="fa-solid fa-folder-open mt-0.5 text-[14px] text-accent"></i>
+                        <p class="leading-relaxed">
+                            Abhi data sirf browser me save hota hai. <span class="font-medium text-primary">Connect files</span> par click karke
+                            <span class="mono text-primary">data/alternatives.js</span> aur <span class="mono text-primary">data/news.js</span> select karo —
+                            uske baad har change seedha unhi files me likha jayega (one JSON per line).
+                        </p>`;
+                }
+            }
+
+            $('fsPill').addEventListener('click', () => {
+                if (fsState === 'on') { toast('File sync already ON — ' + (fsLastSaved ? 'last write ' + fsLastSaved : 'no writes yet')); return; }
+                if (fsState === 'reconnect') reconnect();
+                else connectFiles();
+            });
+
+            /* ================= Data access ================= */
+            function tabArray(tab) {
+                tab = tab || state.tab;
+                if (tab === 'news') return DB.news;
+                if (tab === 'ads') return DB.alternatives.ads;
+                return DB.alternatives.products;
+            }
+            function persist(silent) {
+                if (fsState === 'on') {
+                    writeToDisk().then(ok => {
+                        if (ok && !silent) toast('Saved to data file ✓');
+                    });
+                } else {
+                    saveLS(LS.alts, DB.alternatives);
+                    saveLS(LS.news, DB.news);
+                    $('dirtyBadge').classList.remove('hidden');
+                    if (!silent) toast('Saved (browser storage — files connect karo)');
+                }
+            }
+            const isLive = (r) => r.status === 'active' || r.status === 'published';
+            const liveWord = () => state.tab === 'news' ? 'published' : 'active';
+
+            function rows() {
+                const q = state.q.trim().toLowerCase();
+                let arr = tabArray().filter(r => {
+                    if (state.status === 'live' && !isLive(r)) return false;
+                    if (state.status === 'draft' && r.status !== 'draft') return false;
+                    if (q) {
+                        const hay = [r.name, r.title, r.text, r.description, r.source, r.id, r.license,
+                            ...(r.topics || []), ...(r.categories || []),
+                            ...((r.altTo || []).map(a => a.name))].filter(Boolean).join(' ').toLowerCase();
+                        if (!hay.includes(q)) return false;
+                    }
+                    return true;
+                });
+                arr.sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
+                return arr;
+            }
+
+            /* ================= Stats ================= */
+            function renderStats() {
+                const arr = tabArray();
+                $('cntAlts').textContent = DB.alternatives.products.length;
+                $('cntNews').textContent = DB.news.length;
+                $('cntAds').textContent = DB.alternatives.ads.length;
+
+                $('stTotal').textContent = arr.length;
+                $('stLive').textContent = arr.filter(isLive).length;
+                $('stDraft').textContent = arr.filter(r => r.status === 'draft').length;
+                $('stLiveLabel').textContent = state.tab === 'news' ? 'Published' : 'Live';
+
+                if (state.tab === 'alternatives') {
+                    $('stExtra').textContent = fmt(arr.reduce((s, r) => s + (r.votes || 0), 0));
+                    $('stExtraLabel').textContent = 'Total votes';
+                } else if (state.tab === 'news') {
+                    $('stExtra').textContent = new Set(arr.map(r => r.source)).size;
+                    $('stExtraLabel').textContent = 'Unique sources';
+                } else {
+                    $('stExtra').textContent = arr.length;
+                    $('stExtraLabel').textContent = 'Ad slots';
+                }
+            }
+
+            /* ================= Table render ================= */
+            const ACTIONS = (id) => `
+                <div class="flex items-center justify-end gap-0.5">
+                    <button class="row-btn" data-act="edit" data-id="${id}" title="Edit"><i class="fa-solid fa-pen text-[12px]"></i></button>
+                    <button class="row-btn" data-act="dup" data-id="${id}" title="Duplicate"><i class="fa-regular fa-copy text-[12px]"></i></button>
+                    <button class="row-btn danger" data-act="del" data-id="${id}" title="Delete"><i class="fa-solid fa-trash text-[12px]"></i></button>
+                </div>`;
+
+            const statusBadge = (r) => `
+                <button class="badge ${isLive(r) ? 'badge-live' : 'badge-draft'}" data-act="toggle" data-id="${r.id}" title="Click to toggle status">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full" style="background:currentColor"></span>${r.status}
+                </button>`;
+
+            function renderTable() {
+                const list = rows();
+                const heads = {
+                    alternatives: ['Product', 'ID', 'Pricing', 'Categories', 'Votes', 'Status', 'Added', ''],
+                    news: ['News', 'ID', 'Source', 'Time', 'Status', 'Created', ''],
+                    ads: ['Ad', 'ID', 'Text', 'Status', '']
+                }[state.tab];
+                $('tableHead').innerHTML = '<tr>' + heads.map(h =>
+                    `<th${h === '' ? ' style="text-align:right"' : ''}>${h}</th>`).join('') + '</tr>';
+
+                if (list.length === 0) {
+                    $('tableBody').innerHTML = `
+                        <tr><td colspan="${heads.length}">
+                            <div class="flex flex-col items-center gap-2 py-14 text-center">
+                                <span class="grid h-11 w-11 place-items-center rounded-full border border-border text-secondary">
+                                    <i class="fa-solid fa-magnifying-glass text-[16px]"></i>
+                                </span>
+                                <p class="text-sm font-medium text-primary">No records found</p>
+                                <p class="text-[13px] text-secondary">Search/filters clear karo ya naya record add karo.</p>
+                            </div>
+                        </td></tr>`;
+                } else {
+                    $('tableBody').innerHTML = list.map(r => {
+                        if (state.tab === 'alternatives') {
+                            const cats = (r.categories || []).map(c => `<span class="chip !cursor-default !py-0.5 !px-2 !text-[10px]">${esc(c)}</span>`).join(' ');
+                            return `<tr>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="tile" style="background:${esc(r.logo.bg)};color:${esc(r.logo.fg)}"><i class="${esc(r.logo.icon)} text-[14px]"></i></div>
+                                        <div class="min-w-0">
+                                            <p class="truncate font-medium text-primary" style="max-width:220px">${esc(r.name)}</p>
+                                            <p class="truncate text-[11px] text-secondary" style="max-width:220px">alt to ${(r.altTo || []).map(a => esc(a.name)).join(', ')}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="mono text-[11px] text-secondary">${esc(r.id)}</td>
+                                <td class="text-secondary">${esc(r.pricing)}</td>
+                                <td><div class="flex max-w-[180px] flex-wrap gap-1">${cats}</div></td>
+                                <td class="mono font-semibold">${fmt(r.votes)}</td>
+                                <td>${statusBadge(r)}</td>
+                                <td class="mono text-[11px] text-secondary">${shortDate(r.added)}</td>
+                                <td>${ACTIONS(r.id)}</td>
+                            </tr>`;
+                        }
+                        if (state.tab === 'news') {
+                            return `<tr>
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="tile" style="background:${esc(r.bg)};color:${esc(r.fg)}"><i class="${esc(r.icon)} text-[13px]"></i></div>
+                                        <p class="truncate font-medium text-primary" style="max-width:300px">${esc(r.title)}</p>
+                                    </div>
+                                </td>
+                                <td class="mono text-[11px] text-secondary">${esc(r.id)}</td>
+                                <td class="text-secondary">${esc(r.source)}</td>
+                                <td class="mono text-[11px] text-secondary">${esc(r.time)}</td>
+                                <td>${statusBadge(r)}</td>
+                                <td class="mono text-[11px] text-secondary">${shortDate(r.created_at)}</td>
+                                <td>${ACTIONS(r.id)}</td>
+                            </tr>`;
+                        }
+                        return `<tr>
+                            <td>
+                                <div class="flex items-center gap-3">
+                                    <div class="tile" style="background:${esc(r.bg)};color:${esc(r.fg)}"><i class="${esc(r.icon)} text-[13px]"></i></div>
+                                    <p class="font-medium text-primary">${esc(r.title)}</p>
+                                </div>
+                            </td>
+                            <td class="mono text-[11px] text-secondary">${esc(r.id)}</td>
+                            <td class="text-secondary" style="max-width:340px"><span class="line-clamp-2 block">${esc(r.text)}</span></td>
+                            <td>${statusBadge(r)}</td>
+                            <td>${ACTIONS(r.id)}</td>
+                        </tr>`;
+                    }).join('');
+                }
+
+                $('rowCount').textContent = 'Showing ' + list.length + ' of ' + tabArray().length + ' records';
+            }
+
+            /* ================= Raw view ================= */
+            function renderRaw() {
+                const list = rows();
+                $('rawCount').textContent = list.length;
+                $('rawBody').innerHTML = list.map(r =>
+                    `<div class="raw-line">${esc(JSON.stringify(r))}</div>`).join('') ||
+                    '<p class="py-8 text-center text-sm text-secondary">No records</p>';
+            }
+
+            function renderAll() {
+                renderStats();
+                if (state.view === 'table') renderTable();
+                else renderRaw();
+                $('tableView').classList.toggle('hidden', state.view !== 'table');
+                $('rawView').classList.toggle('hidden', state.view !== 'raw');
+            }
+
+            /* ================= Form (add / edit) ================= */
+            const label = (txt, req) => `<label class="lbl">${txt}${req ? ' <span class="req">*</span>' : ''}</label>`;
+            const inp = (id, val, ph, type) =>
+                `<input id="${id}" type="${type || 'text'}" value="${esc(val)}" placeholder="${esc(ph || '')}" class="inp">`;
+            const num = (id, val) => `<input id="${id}" type="number" value="${esc(val ?? 0)}" class="inp">`;
+            const sel = (id, opts, val) =>
+                `<select id="${id}" class="sel">${opts.map(o => `<option value="${esc(o)}"${o === val ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select>`;
+            const color = (id, val) => `<input id="${id}" type="color" value="${esc(val || '#00a751')}" class="inp-color">`;
+            const iconField = (id, val) => `
+                <div class="flex gap-2">
+                    <input id="${id}" value="${esc(val)}" placeholder="fa-solid fa-bolt" class="inp">
+                    <span id="${id}_prev" class="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-border text-secondary"><i class="${esc(val)}"></i></span>
+                </div>`;
+            const ta = (id, val, ph) => `<textarea id="${id}" placeholder="${esc(ph || '')}" class="ta">${esc(val)}</textarea>`;
+            const cell = (html, full) => `<div class="${full ? 'sm:col-span-2' : ''}">${html}</div>`;
+
+            function buildForm(rec) {
+                rec = rec || {};
+                let html = '';
+                if (state.tab === 'alternatives') {
+                    const cats = rec.categories || [];
+                    html += cell(label('Name', 1) + inp('f_name', rec.name, 'Supabase'));
+                    html += cell(label('Pricing') + sel('f_pricing', ['Open Source', 'Freemium'], rec.pricing || 'Open Source'));
+                    html += cell(label('License') + inp('f_license', rec.license, 'MIT, AGPL-3.0…'));
+                    html += cell(label('Level') + num('f_level', rec.level ?? 1));
+                    html += cell(label('Categories') + `
+                        <div id="f_cats" class="flex flex-wrap gap-1.5">
+                            ${CATS.map(c => `<button type="button" class="chip ${cats.includes(c) ? 'chip-on' : ''}" data-catv="${c}">${c}</button>`).join('')}
+                        </div>`, true);
+                    html += cell(label('Description') + ta('f_desc', rec.description, 'One-two line description…'), true);
+                    html += cell(label('Topics (comma separated)') + inp('f_topics', (rec.topics || []).join(', '), 'database, backend, auth'));
+                    html += cell(label('Alternative to (one per line: Name|#bg|#fg)') + ta('f_alt', (rec.altTo || []).map(a => `${a.name}|${a.bg}|${a.fg}`).join('\n'), 'Firebase|#ffa000|#ffffff'));
+                    html += cell(label('Votes') + num('f_votes', rec.votes ?? 0));
+                    html += cell(label('Comments') + num('f_comments', rec.comments ?? 0));
+                    html += cell(label('Views') + inp('f_views', rec.views, '0'));
+                    html += cell(label('Trending score (0-100)') + num('f_trending', rec.trending ?? 50));
+                    html += cell(label('Added date') + inp('f_added', rec.added || todayStr(), '', 'date'));
+                    html += cell(label('Status') + sel('f_status', ['active', 'draft'], rec.status || 'active'));
+                    html += cell(label('Logo background') + color('f_bg', (rec.logo || {}).bg));
+                    html += cell(label('Logo foreground') + color('f_fg', (rec.logo || {}).fg));
+                    html += cell(label('Icon (Font Awesome class)') + iconField('f_icon', (rec.logo || {}).icon || 'fa-solid fa-bolt'), true);
+                } else if (state.tab === 'news') {
+                    html += cell(label('Title', 1) + inp('f_title', rec.title, 'Supabase launches…'), true);
+                    html += cell(label('Source', 1) + inp('f_source', rec.source, 'Supabase'));
+                    html += cell(label('Relative time') + inp('f_time', rec.time, '2d ago'));
+                    html += cell(label('Status') + sel('f_status', ['published', 'draft'], rec.status || 'published'));
+                    html += cell(label('Tile background') + color('f_bg', rec.bg));
+                    html += cell(label('Tile foreground') + color('f_fg', rec.fg));
+                    html += cell(label('Icon (Font Awesome class)') + iconField('f_icon', rec.icon || 'fa-solid fa-bolt'), true);
+                    html += cell(label('Created at') + inp('f_created', rec.created_at || nowStr(), 'YYYY-MM-DD HH:MM:SS'));
+                } else {
+                    html += cell(label('Title', 1) + inp('f_title', rec.title, 'CodeRabbit'));
+                    html += cell(label('Status') + sel('f_status', ['active', 'draft'], rec.status || 'active'));
+                    html += cell(label('Ad text') + ta('f_text', rec.text, 'Ad copy…'), true);
+                    html += cell(label('Tile background') + color('f_bg', rec.bg));
+                    html += cell(label('Tile foreground') + color('f_fg', rec.fg));
+                    html += cell(label('Icon (Font Awesome class)') + iconField('f_icon', rec.icon || 'fa-solid fa-bug'), true);
+                }
+                $('formBody').innerHTML = html;
+            }
+
+            function openForm(rec) {
+                editingId = rec ? rec.id : null;
+                $('formTitle').textContent = (rec ? 'Edit ' : 'Add ') + state.tab.replace(/s$/, '') + (rec ? '' : ' record');
+                $('formSub').textContent = rec ? 'id: ' + rec.id : 'new id will be auto-generated';
+                buildForm(rec);
+                $('formOverlay').classList.add('open');
+            }
+            const closeForm = () => $('formOverlay').classList.remove('open');
+
+            $('formBody').addEventListener('click', (e) => {
+                const chipBtn = e.target.closest('[data-catv]');
+                if (chipBtn) chipBtn.classList.toggle('chip-on');
+            });
+            $('formBody').addEventListener('input', (e) => {
+                if (e.target.id === 'f_icon') {
+                    const p = $('f_icon_prev');
+                    if (p) p.innerHTML = `<i class="${esc(e.target.value)}"></i>`;
+                }
+            });
+
+            function findRec(id) {
+                return tabArray().find(r => r.id === id);
+            }
+            function errRequired(id) {
+                const el = $(id);
+                if (el) { el.style.borderColor = '#e5484d'; el.focus(); setTimeout(() => el.style.borderColor = '', 1600); }
+                toast('Required field missing', 'fa-solid fa-triangle-exclamation');
+            }
+
+            $('recForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const v = (id) => ($(id) ? $(id).value.trim() : '');
+                const n = (id, def) => { const x = parseInt(v(id), 10); return isNaN(x) ? (def || 0) : x; };
+                let rec;
+
+                if (state.tab === 'alternatives') {
+                    if (!v('f_name')) return errRequired('f_name');
+                    rec = {
+                        id: editingId || genId(),
+                        name: v('f_name'),
+                        status: v('f_status') || 'active',
+                        level: n('f_level', 1),
+                        pricing: v('f_pricing') || 'Open Source',
+                        license: v('f_license') || 'MIT',
+                        categories: [...document.querySelectorAll('#f_cats .chip-on')].map(b => b.dataset.catv),
+                        description: v('f_desc'),
+                        topics: v('f_topics') ? v('f_topics').split(',').map(s => s.trim()).filter(Boolean) : [],
+                        votes: n('f_votes'),
+                        comments: n('f_comments'),
+                        views: v('f_views') || '0',
+                        trending: n('f_trending', 50),
+                        added: v('f_added') || todayStr(),
+                        created_at: (editingId && findRec(editingId) && findRec(editingId).created_at) || nowStr(),
+                        logo: { bg: v('f_bg') || '#00a751', fg: v('f_fg') || '#ffffff', icon: v('f_icon') || 'fa-solid fa-bolt' },
+                        altTo: v('f_alt') ? v('f_alt').split('\n').map(line => {
+                            const parts = line.split('|').map(s => s.trim());
+                            return parts[0] ? { name: parts[0], bg: parts[1] || '#888888', fg: parts[2] || '#ffffff' } : null;
+                        }).filter(Boolean) : []
+                    };
+                } else if (state.tab === 'news') {
+                    if (!v('f_title')) return errRequired('f_title');
+                    rec = {
+                        id: editingId || genId(),
+                        title: v('f_title'),
+                        source: v('f_source') || 'DropStack',
+                        time: v('f_time') || 'just now',
+                        created_at: v('f_created') || nowStr(),
+                        status: v('f_status') || 'published',
+                        icon: v('f_icon') || 'fa-solid fa-bolt',
+                        bg: v('f_bg') || '#00a751',
+                        fg: v('f_fg') || '#ffffff'
+                    };
+                } else {
+                    if (!v('f_title')) return errRequired('f_title');
+                    rec = {
+                        id: editingId || genId(),
+                        status: v('f_status') || 'active',
+                        title: v('f_title'),
+                        bg: v('f_bg') || '#00a751',
+                        fg: v('f_fg') || '#ffffff',
+                        icon: v('f_icon') || 'fa-solid fa-bug',
+                        text: v('f_text'),
+                        created_at: (editingId && findRec(editingId) && findRec(editingId).created_at) || nowStr()
+                    };
+                }
+
+                const arr = tabArray();
+                if (editingId) {
+                    const i = arr.findIndex(r => r.id === editingId);
+                    if (i > -1) arr[i] = rec;
+                } else {
+                    arr.unshift(rec);
+                }
+                persist();
+                closeForm();
+                renderAll();
+            });
+
+            /* ================= Row actions ================= */
+            $('tableBody').addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-act]');
+                if (!btn) return;
+                const id = btn.dataset.id, act = btn.dataset.act;
+                const arr = tabArray();
+                const idx = arr.findIndex(r => r.id === id);
+                if (idx < 0) return;
+                const rec = arr[idx];
+
+                if (act === 'edit') openForm(rec);
+
+                if (act === 'toggle') {
+                    rec.status = rec.status === 'draft' ? liveWord() : 'draft';
+                    persist(); renderAll();
+                    toast('Status → ' + rec.status);
+                }
+
+                if (act === 'dup') {
+                    const copy = JSON.parse(JSON.stringify(rec));
+                    copy.id = genId();
+                    copy.created_at = nowStr();
+                    copy.status = 'draft';
+                    if (copy.name) copy.name += ' (copy)';
+                    if (copy.title) copy.title += ' (copy)';
+                    arr.splice(idx + 1, 0, copy);
+                    persist(); renderAll();
+                    toast('Duplicated as draft — ' + copy.id);
+                }
+
+                if (act === 'del') {
+                    askConfirm('Delete record?', `"${rec.name || rec.title}" (id: ${id}) data file se permanently delete ho jayega.`, () => {
+                        arr.splice(idx, 1);
+                        persist(); renderAll();
+                        toast('Deleted from data file', 'fa-solid fa-trash');
+                    });
+                }
+            });
+
+            /* ================= Confirm modal ================= */
+            let confirmCb = null;
+            function askConfirm(title, msg, cb) {
+                $('confirmTitle').textContent = title;
+                $('confirmMsg').textContent = msg;
+                confirmCb = cb;
+                $('confirmOverlay').classList.add('open');
+            }
+            const closeConfirm = () => $('confirmOverlay').classList.remove('open');
+            $('confirmNo').addEventListener('click', closeConfirm);
+            $('confirmYes').addEventListener('click', () => { closeConfirm(); if (confirmCb) confirmCb(); confirmCb = null; });
+            $('confirmOverlay').addEventListener('click', (e) => { if (e.target === $('confirmOverlay')) closeConfirm(); });
+
+            /* ================= Export (fallback) ================= */
+            $('exportBtn').addEventListener('click', () => {
+                const isNews = state.tab === 'news';
+                const content = isNews ? buildNewsFile() : buildAlternativesFile();
+                const blob = new Blob([content], { type: 'text/javascript' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = isNews ? 'news.js' : 'alternatives.js';
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+                toast((isNews ? 'news.js' : 'alternatives.js') + ' downloaded', 'fa-solid fa-download');
+            });
+
+            /* ================= Raw copy ================= */
+            $('copyRawBtn').addEventListener('click', async () => {
+                const text = rows().map(r => JSON.stringify(r)).join('\n');
+                if (!text) return toast('Nothing to copy', 'fa-solid fa-triangle-exclamation');
+                try {
+                    await navigator.clipboard.writeText(text);
+                    toast('Copied ' + rows().length + ' lines', 'fa-regular fa-copy');
+                } catch (e) {
+                    const taEl = document.createElement('textarea');
+                    taEl.value = text; document.body.appendChild(taEl);
+                    taEl.select(); document.execCommand('copy'); taEl.remove();
+                    toast('Copied ' + rows().length + ' lines', 'fa-regular fa-copy');
+                }
+            });
+
+            /* ================= Reset ================= */
+            $('resetBtn').addEventListener('click', () => {
+                askConfirm('Restore file data?', 'Original data par wapas jaoge. Agar files connected hain to disk files bhi overwrite ho jayengi.', () => {
+                    DB = { alternatives: deep(FILE.alternatives), news: deep(FILE.news) };
+                    clearLS(LS.alts); clearLS(LS.news);
+                    $('dirtyBadge').classList.add('hidden');
+                    persist(true); renderAll();
+                    toast('Restored', 'fa-solid fa-rotate-left');
+                });
+            });
+
+            /* ================= Controls ================= */
+            document.querySelectorAll('.tab[data-tab]').forEach(b => b.addEventListener('click', () => {
+                state.tab = b.dataset.tab;
+                document.querySelectorAll('.tab[data-tab]').forEach(x => x.classList.toggle('active', x === b));
+                renderAll();
+            }));
+
+            const searchInput = $('searchInput');
+            let sTimer;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(sTimer);
+                sTimer = setTimeout(() => { state.q = searchInput.value; renderAll(); }, 160);
+            });
+            $('statusFilter').addEventListener('change', (e) => { state.status = e.target.value; renderAll(); });
+
+            $('viewTable').addEventListener('click', () => { state.view = 'table'; syncView(); });
+            $('viewRaw').addEventListener('click', () => { state.view = 'raw'; syncView(); });
+            function syncView() {
+                $('viewTable').classList.toggle('on', state.view === 'table');
+                $('viewRaw').classList.toggle('on', state.view === 'raw');
+                renderAll();
+            }
+
+            $('addBtn').addEventListener('click', () => openForm(null));
+            $('formClose').addEventListener('click', closeForm);
+            $('formCancel').addEventListener('click', closeForm);
+            $('formOverlay').addEventListener('click', (e) => { if (e.target === $('formOverlay')) closeForm(); });
+
+            /* ================= Keyboard ================= */
+            document.addEventListener('keydown', (e) => {
+                const typing = document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+                if (e.key === 'Escape') { closeThemeMenu(); closeForm(); closeConfirm(); }
+                if (e.key === '/' && !typing) { e.preventDefault(); searchInput.focus(); }
+            });
+
+            /* ================= Boot ================= */
+            applyTheme(false);
+            syncModeUI();
+            renderAll();
+            if (!DATA_LOADED.alts || !DATA_LOADED.news) {
+                const missing = [];
+                if (!DATA_LOADED.alts) missing.push('data/alternatives.js');
+                if (!DATA_LOADED.news) missing.push('data/news.js');
+                const warn = document.createElement('div');
+                warn.className = 'mt-4 flex items-start gap-3 rounded-xl border p-4 text-[13px]';
+                warn.style.borderColor = 'color-mix(in srgb, #e5a13d 45%, var(--border))';
+                warn.style.background = 'color-mix(in srgb, #e5a13d 8%, transparent)';
+                warn.innerHTML = `
+                    <i class="fa-solid fa-triangle-exclamation mt-0.5 text-[14px]" style="color:#e5a13d"></i>
+                    <p class="leading-relaxed text-secondary">
+                        <span class="font-semibold text-primary">${missing.join(' aur ')} load nahi hua.</span>
+                        file:// protocol ki wajah se ho sakta hai — project folder ko local server se kholo
+                        (<span class="mono">VS Code Live Server</span> ya <span class="mono">python -m http.server</span>, phir
+                        <span class="mono">http://localhost:8000/data.html</span>). Ya check karo ki files sahi path par hain.
+                    </p>`;
+                document.querySelector('main .mx-auto').insertBefore(warn, $('modeNote'));
+            }
+            if (fsState !== 'on' && (loadLS(LS.alts) || loadLS(LS.news))) $('dirtyBadge').classList.remove('hidden');
+            restoreHandles();
+        })();
+    </script>
+</body>
+</html>

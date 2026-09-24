@@ -27,8 +27,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
 
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <script>
         tailwind.config = {
@@ -102,6 +102,9 @@
         .theme-anim, .theme-anim *, .theme-anim *::before, .theme-anim *::after {
             transition: background-color .35s ease, border-color .35s ease, color .35s ease, fill .35s ease, box-shadow .35s ease !important;
         }
+
+        /* Diagonal up-right arrow (Font Awesome arrow ko rotate karke) */
+        .i-arrow-up-right { display: inline-block; transform: rotate(-45deg); }
 
         /* ============ Hero grid background ============ */
         .grid-bg {
@@ -251,11 +254,10 @@
             color: var(--foreground); border-color: color-mix(in srgb, var(--foreground) 25%, var(--border));
             background: color-mix(in srgb, var(--foreground) 4%, transparent);
         }
-        .vote-btn svg { transition: transform .15s ease; }
-        .vote-btn:hover svg { transform: translateY(-1px); }
+        .vote-btn i { transition: transform .15s ease; }
+        .vote-btn:hover i { transform: translateY(-1px); }
         .vote-btn.is-voted { background: var(--accent); border-color: var(--accent); color: #06130b; }
         .vote-btn.is-voted:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-        .vote-btn.is-voted svg { fill: currentColor; }
 
         .pricing-badge {
             font-size: 10px; font-weight: 500; line-height: 1; padding: 3px 7px;
@@ -347,34 +349,35 @@
                 <!-- Right: actions -->
                 <div class="flex items-center gap-2">
                     <button id="headerSearch" class="icon-btn" aria-label="Search alternatives">
-                        <span><i data-lucide="search" class="w-4 h-4"></i></span>
+                        <span><i class="fa-solid fa-magnifying-glass text-[15px]"></i></span>
                     </button>
-                    <a href="https://github.com/piotrkulpinski/openalternative" target="_blank" rel="noopener"
+                    <a href="https://github.com/abdullah2309/" target="_blank" rel="noopener"
+                    /* <a href="https://github.com/piotrkulpinski/openalternative" target="_blank" rel="noopener" */
                        class="btn btn-outline hidden sm:inline-flex" title="Star DropStack on GitHub">
-                        <span><i data-lucide="github" class="w-4 h-4"></i></span>
+                        <span><i class="fa-brands fa-github text-[15px]"></i></span>
                         <span class="font-mono text-xs font-medium">4.2k</span>
                     </a>
 
                     <!-- Theme dropdown (moon icon) -->
                     <div class="theme-wrap relative" id="themeWrap">
                         <button id="themeBtn" class="icon-btn" aria-label="Change theme" aria-haspopup="listbox" aria-expanded="false">
-                            <span id="tiSun" class="hidden"><i data-lucide="sun" class="w-4 h-4"></i></span>
-                            <span id="tiMoon"><i data-lucide="moon" class="w-4 h-4"></i></span>
-                            <span id="tiMonitor" class="hidden"><i data-lucide="monitor" class="w-4 h-4"></i></span>
+                            <span id="tiSun" class="hidden"><i class="fa-solid fa-sun text-[15px]"></i></span>
+                            <span id="tiMoon"><i class="fa-solid fa-moon text-[15px]"></i></span>
+                            <span id="tiMonitor" class="hidden"><i class="fa-solid fa-desktop text-[15px]"></i></span>
                         </button>
                         <div class="theme-menu" id="themeMenu" role="listbox" aria-label="Appearance">
                             <p class="px-2.5 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wider text-secondary">Appearance</p>
                             <button class="theme-option" role="option" data-set-theme="light" aria-selected="false">
-                                <span><i data-lucide="sun" class="w-4 h-4"></i></span> Light
-                                <span class="check"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                                <span><i class="fa-solid fa-sun text-[14px]"></i></span> Light
+                                <span class="check"><i class="fa-solid fa-check text-[12px]"></i></span>
                             </button>
                             <button class="theme-option" role="option" data-set-theme="dark" aria-selected="false">
-                                <span><i data-lucide="moon" class="w-4 h-4"></i></span> Dark
-                                <span class="check"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                                <span><i class="fa-solid fa-moon text-[14px]"></i></span> Dark
+                                <span class="check"><i class="fa-solid fa-check text-[12px]"></i></span>
                             </button>
                             <button class="theme-option" role="option" data-set-theme="system" aria-selected="false">
-                                <span><i data-lucide="monitor" class="w-4 h-4"></i></span> System
-                                <span class="check"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+                                <span><i class="fa-solid fa-desktop text-[14px]"></i></span> System
+                                <span class="check"><i class="fa-solid fa-check text-[12px]"></i></span>
                             </button>
                         </div>
                     </div>
@@ -382,8 +385,8 @@
                     <a href="#" class="btn btn-outline hidden md:inline-flex">Sign In</a>
                     <a href="#" class="btn btn-solid">Submit</a>
                     <button id="menuBtn" class="icon-btn md:hidden" aria-label="Toggle menu">
-                        <span id="miMenu"><i data-lucide="menu" class="w-4 h-4"></i></span>
-                        <span id="miClose" class="hidden"><i data-lucide="x" class="w-4 h-4"></i></span>
+                        <span id="miMenu"><i class="fa-solid fa-bars text-[15px]"></i></span>
+                        <span id="miClose" class="hidden"><i class="fa-solid fa-xmark text-[15px]"></i></span>
                     </button>
                 </div>
             </div>
@@ -411,7 +414,7 @@
 
             <div class="relative mx-auto max-w-3xl px-4 pb-16 pt-20 text-center sm:pt-24">
                 <a href="#" class="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-secondary transition-colors hover:border-accent hover:text-primary">
-                    <i data-lucide="rocket" class="w-3.5 h-3.5"></i> Built with Astro
+                    <i class="fa-solid fa-rocket text-[13px]"></i> Built with Astro
                 </a>
 
                 <h1 class="mt-7 text-[38px] font-bold leading-[1.06] tracking-[-0.03em] sm:text-[54px]">
@@ -426,7 +429,7 @@
                 <!-- Search -->
                 <div class="relative mx-auto mt-9 w-full max-w-xl">
                     <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-secondary">
-                        <i data-lucide="search" class="w-4 h-4"></i>
+                        <i class="fa-solid fa-magnifying-glass text-[16px]"></i>
                     </span>
                     <input id="searchInput" type="text" autocomplete="off" spellcheck="false"
                            class="search-input"
@@ -434,7 +437,7 @@
                            aria-label="Search alternatives">
                     <kbd id="kbdHint" class="pointer-events-none absolute right-3.5 top-1/2 hidden h-5 min-w-[20px] -translate-y-1/2 items-center justify-center rounded border border-border bg-card px-1.5 font-mono text-[10px] text-secondary sm:flex">/</kbd>
                     <button id="clearBtn" class="clear-btn hidden" aria-label="Clear search">
-                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        <i class="fa-solid fa-xmark text-[13px]"></i>
                     </button>
                 </div>
 
@@ -468,7 +471,7 @@
                     <!-- Category pills with scroll arrows -->
                     <div id="categories" class="flex items-center gap-2">
                         <button id="pillPrev" class="pill-arrow" aria-label="Scroll categories left">
-                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            <i class="fa-solid fa-chevron-left text-[13px]"></i>
                         </button>
                         <div id="pillScroller" class="no-scrollbar flex flex-1 gap-2 overflow-x-auto">
                             <button class="pill active" data-cat="all">All</button>
@@ -482,7 +485,7 @@
                             <button class="pill" data-cat="communication">Communication</button>
                         </div>
                         <button id="pillNext" class="pill-arrow" aria-label="Scroll categories right">
-                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            <i class="fa-solid fa-chevron-right text-[13px]"></i>
                         </button>
                     </div>
 
@@ -503,7 +506,7 @@
                     <div class="mt-7 flex justify-center">
                         <button id="showMoreBtn" class="show-more">
                             <span id="showMoreLabel">Show more</span>
-                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            <i class="fa-solid fa-chevron-down text-[13px]"></i>
                         </button>
                     </div>
                 </div>
@@ -516,11 +519,11 @@
                         <div>
                             <div class="flex items-center justify-between border-b border-border pb-3">
                                 <h2 class="flex items-center gap-2 text-sm font-semibold text-primary">
-                                    <i data-lucide="newspaper" class="w-4 h-4 text-accent"></i>
+                                    <i class="fa-solid fa-newspaper text-[14px] text-accent"></i>
                                     News
                                 </h2>
                                 <a href="#" class="inline-flex items-center gap-1 text-xs font-medium text-secondary transition-colors hover:text-primary">
-                                    View all <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                                    View all <i class="fa-solid fa-arrow-right text-[11px]"></i>
                                 </a>
                             </div>
                             <div id="newsList"></div>
@@ -529,20 +532,20 @@
                         <!-- Follow on X card -->
                         <a href="#" class="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-accent">
                             <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg" style="background:var(--foreground);color:var(--background)">
-                                <i data-lucide="twitter" class="w-4 h-4"></i>
+                                <i class="fa-brands fa-x-twitter text-[15px]"></i>
                             </span>
                             <span class="min-w-0 flex-1">
                                 <span class="block text-[13px] font-semibold text-primary">Follow @dropstack</span>
                                 <span class="mt-0.5 block text-[11px] leading-snug text-secondary">Newest alternatives, straight in your feed.</span>
                             </span>
-                            <i data-lucide="arrow-up-right" class="w-4 h-4 shrink-0 text-secondary transition-colors group-hover:text-accent"></i>
+                            <i class="fa-solid fa-arrow-right i-arrow-up-right shrink-0 text-[14px] text-secondary transition-colors group-hover:text-accent"></i>
                         </a>
 
                         <!-- Newsletter card -->
                         <div class="rounded-xl border border-border bg-card p-5">
                             <div class="flex items-center gap-2.5">
                                 <span class="grid h-7 w-7 place-items-center rounded-md border border-border text-accent">
-                                    <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                                    <i class="fa-solid fa-envelope text-[13px]"></i>
                                 </span>
                                 <h3 class="text-sm font-semibold text-primary">Open Source Weekly</h3>
                             </div>
@@ -567,16 +570,16 @@
                 <a href="#" class="mt-1.5 inline-block text-xs font-medium text-secondary underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary">Advertise with us</a>
 
                 <div class="mt-8 grid grid-cols-2 overflow-hidden rounded-xl border-t border-l border-border md:grid-cols-5">
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="codepen" class="w-4 h-4"></i><span>CodeRabbit</span></a>
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="plane" class="w-4 h-4"></i><span>Openlane</span></a>
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="aperture" class="w-4 h-4"></i><span>capture.page</span></a>
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="send" class="w-4 h-4"></i><span>Sent</span></a>
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="database" class="w-4 h-4"></i><span>influxdata</span></a>
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="file-text" class="w-4 h-4"></i><span>Docmost</span></a>
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="code" class="w-4 h-4"></i><span>c15t</span></a>
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="camera" class="w-4 h-4"></i><span>ScreenshotOne</span></a>
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="file-box" class="w-4 h-4"></i><span>postiz</span></a>
-                    <a href="#" class="sponsor-cell border-r border-b border-border"><i data-lucide="wind" class="w-4 h-4"></i><span>Windshift</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-brands fa-codepen text-[15px]"></i><span>CodeRabbit</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-solid fa-plane text-[15px]"></i><span>Openlane</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-solid fa-aperture text-[15px]"></i><span>capture.page</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-solid fa-paper-plane text-[15px]"></i><span>Sent</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-solid fa-database text-[15px]"></i><span>influxdata</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-solid fa-file-lines text-[15px]"></i><span>Docmost</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-solid fa-code text-[15px]"></i><span>c15t</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-solid fa-camera text-[15px]"></i><span>ScreenshotOne</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-solid fa-box-archive text-[15px]"></i><span>postiz</span></a>
+                    <a href="#" class="sponsor-cell border-r border-b border-border"><i class="fa-solid fa-wind text-[15px]"></i><span>Windshift</span></a>
                 </div>
             </div>
         </section>
@@ -595,9 +598,9 @@
                         Discover open source alternatives to popular SaaS products. Ditch subscriptions, own your data, and support the open source movement.
                     </p>
                     <div class="mt-5 flex gap-2">
-                        <a href="#" class="icon-btn" aria-label="X (Twitter)"><span><i data-lucide="twitter" class="w-4 h-4"></i></span></a>
-                        <a href="https://github.com/piotrkulpinski/openalternative" target="_blank" rel="noopener" class="icon-btn" aria-label="GitHub"><span><i data-lucide="github" class="w-4 h-4"></i></span></a>
-                        <a href="#" class="icon-btn" aria-label="Mastodon"><span><i data-lucide="mastodon" class="w-4 h-4"></i></span></a>
+                        <a href="#" class="icon-btn" aria-label="X (Twitter)"><span><i class="fa-brands fa-x-twitter text-[15px]"></i></span></a>
+                        <a href="https://github.com/piotrkulpinski/openalternative" target="_blank" rel="noopener" class="icon-btn" aria-label="GitHub"><span><i class="fa-brands fa-github text-[15px]"></i></span></a>
+                        <a href="#" class="icon-btn" aria-label="Mastodon"><span><i class="fa-brands fa-mastodon text-[15px]"></i></span></a>
                     </div>
                 </div>
 
@@ -634,7 +637,7 @@
 
             <div class="mt-12 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-secondary sm:flex-row">
                 <p>© 2025 DropStack. All listings belong to their respective owners.</p>
-                <p class="flex items-center gap-1.5">Made with <i data-lucide="heart" class="w-3 h-3 text-accent"></i> by the open source community</p>
+                <p class="flex items-center gap-1.5">Made with <i class="fa-solid fa-heart text-[11px] text-accent"></i> by the open source community</p>
             </div>
         </div>
     </footer>
@@ -643,11 +646,11 @@
     <aside id="floatAd" class="geist-shadow fixed bottom-5 right-5 z-30 hidden w-[calc(100vw-2.5rem)] max-w-xs rounded-xl border border-border bg-popover p-4 lg:block">
         <button id="floatAdClose" aria-label="Dismiss ad"
                 class="absolute right-2.5 top-2.5 grid h-6 w-6 place-items-center rounded-md text-secondary transition-colors hover:text-primary">
-            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            <i class="fa-solid fa-xmark text-[13px]"></i>
         </button>
         <div class="flex gap-3 pr-6">
             <div class="tile !h-9 !w-9" style="background:#18181b;color:#ffffff">
-                <i data-lucide="camera" class="h-[18px] w-[18px]"></i>
+                <i class="fa-solid fa-camera text-[16px]"></i>
             </div>
             <div class="min-w-0">
                 <div class="flex items-center gap-2">
@@ -656,146 +659,24 @@
                 </div>
                 <p class="mt-1.5 text-xs leading-relaxed text-secondary">Capture pixel-perfect screenshots of any website with a simple API. Trusted by 3,000+ developers.</p>
                 <a href="#" class="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary underline decoration-border underline-offset-4 transition-colors hover:decoration-primary">
-                    Learn more <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                    Learn more <i class="fa-solid fa-arrow-right text-[11px]"></i>
                 </a>
             </div>
         </div>
     </aside>
 
+    <!-- ================= Data files (alternatives + news) ================= -->
+    <script src="data/alternatives.js"></script>
+    <script src="data/news.js"></script>
+
     <script>
         (function () {
             'use strict';
 
-            /* ================= Data ================= */
-            const PRODUCTS = [
-                { name: 'Supabase', pricing: 'Freemium', license: 'Apache-2.0', categories: ['developer-tools', 'databases'],
-                  description: 'The open source Firebase alternative. Supabase gives you a fully managed Postgres database, authentication, instant APIs, edge functions, realtime subscriptions and file storage.',
-                  topics: ['database', 'backend', 'auth', 'developer-tools'],
-                  votes: 1243, comments: 58, views: '96.4k', trending: 92, added: '2024-11-18',
-                  logo: { bg: '#3ecf8e', fg: '#03251a', icon: 'zap' },
-                  altTo: [{ name: 'Firebase', bg: '#ffa000', fg: '#ffffff' }] },
-
-                { name: 'Godot Engine', pricing: 'Open Source', license: 'MIT', categories: ['developer-tools'],
-                  description: 'Godot Engine is a feature-packed, cross-platform game engine to create 2D and 3D games from a unified interface. Completely free and open source, no strings attached.',
-                  topics: ['gamedev', 'game-development', 'cross-platform', 'engine'],
-                  votes: 1108, comments: 41, views: '58.2k', trending: 89, added: '2024-11-02',
-                  logo: { bg: '#478cbf', fg: '#ffffff', icon: 'gamepad-2' },
-                  altTo: [{ name: 'Unity', bg: '#2d2d2d', fg: '#ffffff' }] },
-
-                { name: 'AppFlowy', pricing: 'Freemium', license: 'AGPL-3.0', categories: ['productivity'],
-                  description: 'AppFlowy is an AI collaborative workspace where you achieve more without losing your data privacy. Built with Flutter and Rust, the best Notion alternative for teams.',
-                  topics: ['note-taking', 'knowledge-management', 'wiki', 'ai'],
-                  votes: 982, comments: 47, views: '41.7k', trending: 84, added: '2024-09-30',
-                  logo: { bg: '#f3c23d', fg: '#3b2c00', icon: 'notebook-pen' },
-                  altTo: [{ name: 'Notion', bg: '#191919', fg: '#ffffff' }] },
-
-                { name: 'Plausible', pricing: 'Freemium', license: 'AGPL-3.0', categories: ['analytics'],
-                  description: 'Plausible is a lightweight and open source web analytics tool. Simple, privacy-friendly, cookie-free analytics that does not slow down your site or your visitors.',
-                  topics: ['analytics', 'web-analytics', 'privacy', 'seo'],
-                  votes: 845, comments: 36, views: '38.9k', trending: 74, added: '2024-09-12',
-                  logo: { bg: '#2ab3a6', fg: '#ffffff', icon: 'bar-chart-3' },
-                  altTo: [{ name: 'Google Analytics', bg: '#e37400', fg: '#ffffff' }] },
-
-                { name: 'Cal.com', pricing: 'Freemium', license: 'AGPL-3.0', categories: ['productivity'],
-                  description: 'Cal.com is open-source scheduling infrastructure for everyone. Book meetings without the back-and-forth emails, fully white-label and API-first.',
-                  topics: ['scheduling', 'calendar', 'booking', 'api'],
-                  votes: 761, comments: 29, views: '31.3k', trending: 86, added: '2024-10-28',
-                  logo: { bg: '#1c1c1f', fg: '#ffffff', icon: 'calendar' },
-                  altTo: [{ name: 'Calendly', bg: '#006bff', fg: '#ffffff' }] },
-
-                { name: 'Excalidraw', pricing: 'Open Source', license: 'MIT', categories: ['design'],
-                  description: 'Excalidraw is a virtual collaborative whiteboard tool that lets you easily sketch diagrams that have a hand-drawn feel to them. Collaborate and share with your team.',
-                  topics: ['whiteboard', 'diagrams', 'drawing', 'collaboration'],
-                  votes: 723, comments: 25, views: '44.6k', trending: 68, added: '2024-08-10',
-                  logo: { bg: '#6965db', fg: '#ffffff', icon: 'pencil' },
-                  altTo: [{ name: 'Miro', bg: '#ffd02f', fg: '#3a2e00' }] },
-
-                { name: 'n8n', pricing: 'Freemium', license: 'Fair-code', categories: ['developer-tools'],
-                  description: 'n8n is a fair-code licensed workflow automation tool with native AI capabilities. Connect anything to everything and build custom integrations visually.',
-                  topics: ['automation', 'workflows', 'integrations', 'no-code'],
-                  votes: 690, comments: 33, views: '52.1k', trending: 81, added: '2024-10-15',
-                  logo: { bg: '#ea4b71', fg: '#ffffff', icon: 'workflow' },
-                  altTo: [{ name: 'Zapier', bg: '#ff4f00', fg: '#ffffff' }] },
-
-                { name: 'Ghost', pricing: 'Freemium', license: 'MIT', categories: ['cms', 'marketing'],
-                  description: 'Ghost is a powerful app for creators to publish, share, and grow a business around their content. The best newsletter platform and Substack alternative.',
-                  topics: ['blogging', 'newsletter', 'cms', 'publishing'],
-                  votes: 611, comments: 22, views: '29.8k', trending: 70, added: '2024-08-27',
-                  logo: { bg: '#e9e9ee', fg: '#15171a', icon: 'ghost' },
-                  altTo: [{ name: 'Substack', bg: '#ff6719', fg: '#ffffff' }] },
-
-                { name: 'Postiz', pricing: 'Open Source', license: 'AGPL-3.0', categories: ['marketing'],
-                  description: 'Postiz is the ultimate open-source social media scheduling tool. Schedule posts, analyze performance and manage all your social accounts from one place.',
-                  topics: ['social-media', 'scheduling', 'marketing', 'ai'],
-                  votes: 578, comments: 19, views: '18.6k', trending: 98, added: '2024-12-22',
-                  logo: { bg: '#b4e34a', fg: '#1f2900', icon: 'send' },
-                  altTo: [{ name: 'Buffer', bg: '#2f2f33', fg: '#ffffff' }] },
-
-                { name: 'Listmonk', pricing: 'Open Source', license: 'AGPL-3.0', categories: ['marketing'],
-                  description: 'Listmonk is a high performance, self-hosted newsletter and mailing list manager with a modern dashboard. One binary, one config file, zero dependencies.',
-                  topics: ['newsletter', 'email-marketing', 'mailing-list', 'self-hosted'],
-                  votes: 495, comments: 14, views: '15.2k', trending: 64, added: '2024-07-05',
-                  logo: { bg: '#e8604c', fg: '#ffffff', icon: 'mail' },
-                  altTo: [{ name: 'Mailchimp', bg: '#ffe01b', fg: '#241f00' }] },
-
-                { name: 'Docmost', pricing: 'Open Source', license: 'AGPL-3.0', categories: ['productivity'],
-                  description: 'Docmost is an open-source collaborative wiki and documentation software. Real-time collaboration, permissions, spaces and comments for your team knowledge.',
-                  topics: ['wiki', 'knowledge-management', 'documentation', 'collaboration'],
-                  votes: 431, comments: 12, views: '9.8k', trending: 95, added: '2025-01-12',
-                  logo: { bg: '#2f6fed', fg: '#ffffff', icon: 'book-open' },
-                  altTo: [{ name: 'Notion', bg: '#191919', fg: '#ffffff' }, { name: 'Confluence', bg: '#172b4d', fg: '#ffffff' }] },
-
-                { name: 'Baserow', pricing: 'Freemium', license: 'MIT', categories: ['databases'],
-                  description: 'Baserow is an open source no-code database and Airtable alternative. Create your own online database without any technical experience.',
-                  topics: ['database', 'no-code', 'spreadsheet', 'airtable'],
-                  votes: 389, comments: 11, views: '12.4k', trending: 66, added: '2024-11-25',
-                  logo: { bg: '#45c481', fg: '#06281a', icon: 'table-2' },
-                  altTo: [{ name: 'Airtable', bg: '#fcb400', fg: '#332700' }] },
-
-                { name: 'Appwrite', pricing: 'Open Source', license: 'BSD-3', categories: ['developer-tools'],
-                  description: 'Appwrite is a self-hosted backend platform providing REST APIs for auth, databases, storage and functions. Build your next app 10x faster.',
-                  topics: ['backend', 'database', 'auth', 'serverless'],
-                  votes: 372, comments: 16, views: '14.9k', trending: 62, added: '2024-07-28',
-                  logo: { bg: '#fd3667', fg: '#ffffff', icon: 'server' },
-                  altTo: [{ name: 'Firebase', bg: '#ffa000', fg: '#ffffff' }] },
-
-                { name: 'Chatwoot', pricing: 'Open Source', license: 'MIT', categories: ['communication'],
-                  description: 'Chatwoot gives you all the tools to manage conversations and build relationships with your customers. The open source Intercom alternative for live chat.',
-                  topics: ['live-chat', 'customer-support', 'crm', 'helpdesk'],
-                  votes: 331, comments: 9, views: '11.3k', trending: 72, added: '2024-12-01',
-                  logo: { bg: '#1e90e6', fg: '#ffffff', icon: 'message-circle' },
-                  altTo: [{ name: 'Intercom', bg: '#3b5bdb', fg: '#ffffff' }] },
-
-                { name: 'Umami', pricing: 'Open Source', license: 'MIT', categories: ['analytics'],
-                  description: 'Umami is a simple, fast, privacy-focused alternative to Google Analytics. It collects only the metrics you need and keeps your visitors data yours.',
-                  topics: ['analytics', 'web-analytics', 'privacy', 'self-hosted'],
-                  votes: 305, comments: 8, views: '10.1k', trending: 78, added: '2024-12-15',
-                  logo: { bg: '#e8e8eb', fg: '#17171b', icon: 'pie-chart' },
-                  altTo: [{ name: 'Google Analytics', bg: '#e37400', fg: '#ffffff' }] },
-
-                { name: 'Typebot', pricing: 'Open Source', license: 'FSL', categories: ['productivity'],
-                  description: 'Typebot gives you powerful blocks to create unique chat experiences. The open source conversational form builder and Typeform alternative.',
-                  topics: ['forms', 'chatbot', 'conversational', 'typeform'],
-                  votes: 266, comments: 7, views: '7.4k', trending: 76, added: '2025-01-05',
-                  logo: { bg: '#4f46e5', fg: '#ffffff', icon: 'bot' },
-                  altTo: [{ name: 'Typeform', bg: '#262627', fg: '#ffffff' }] }
-            ];
-
-            const ADS = [
-                { title: 'CodeRabbit', bg: '#7b2fbe', fg: '#ffffff', icon: 'rabbit',
-                  text: 'The leading AI code review platform. Ship better quality code in 50% less time, with 90% fewer bugs.' },
-                { title: 'c15t', bg: 'var(--accent)', fg: '#06130b', icon: 'cookie',
-                  text: 'Open-source cookie consent, built for control and lightning-fast modern web apps.' }
-            ];
-
-            const NEWS = [
-                { title: 'Supabase launches Realtime Broadcast and Presence for multiplayer apps', source: 'Supabase', time: '2d ago', icon: 'zap', bg: '#3ecf8e', fg: '#03251a' },
-                { title: 'Godot 4.4 is out: physics interpolation, embedded games and more', source: 'Godot', time: '5d ago', icon: 'gamepad-2', bg: '#478cbf', fg: '#ffffff' },
-                { title: 'Postiz raises $2M seed to take on Buffer and Hootsuite', source: 'Postiz', time: '1w ago', icon: 'send', bg: '#b4e34a', fg: '#1f2900' },
-                { title: 'n8n crosses 100k stars on GitHub as AI workflows boom', source: 'n8n', time: '1w ago', icon: 'workflow', bg: '#ea4b71', fg: '#ffffff' },
-                { title: 'Umami Cloud adds funnel and retention reports, still cookie-free', source: 'Umami', time: '2w ago', icon: 'pie-chart', bg: '#e8e8eb', fg: '#17171b' },
-                { title: 'Excalidraw introduces embeds and Mermaid diagram conversion', source: 'Excalidraw', time: '2w ago', icon: 'pencil', bg: '#6965db', fg: '#ffffff' }
-            ];
+            /* ================= Data (from data/*.js files) ================= */
+            const PRODUCTS = (window.ALTERNATIVES_DATA && window.ALTERNATIVES_DATA.products) || [];
+            const ADS = (window.ALTERNATIVES_DATA && window.ALTERNATIVES_DATA.ads) || [];
+            const NEWS = window.NEWS_DATA || [];
 
             /* ================= Helpers ================= */
             const $ = (id) => document.getElementById(id);
@@ -890,7 +771,7 @@
                 return `
                 <article class="card-item flex gap-4 p-4 sm:p-5" style="animation-delay:${delay}ms">
                     <div class="tile shrink-0" style="background:${p.logo.bg};color:${p.logo.fg}">
-                        <i data-lucide="${p.logo.icon}" class="h-[22px] w-[22px]"></i>
+                        <i class="${p.logo.icon} text-[20px]"></i>
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex items-start justify-between gap-3">
@@ -904,7 +785,7 @@
                                 </p>
                             </div>
                             <button class="vote-btn ${isVoted ? 'is-voted' : ''}" data-vote="${p.name}" title="Upvote ${p.name}" aria-label="Upvote ${p.name}">
-                                <i data-lucide="caret-up" class="w-3.5 h-3.5"></i>
+                                <i class="fa-solid fa-caret-up text-[12px]"></i>
                                 <span class="vote-count">${fmt(effectiveVotes(p))}</span>
                             </button>
                         </div>
@@ -912,11 +793,11 @@
                         <div class="mt-3.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                             <div class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5">
                                 ${topics}
-                                <span class="license-chip"><i data-lucide="scale" class="w-3 h-3"></i>${p.license}</span>
+                                <span class="license-chip"><i class="fa-solid fa-scale-balanced text-[10px]"></i>${p.license}</span>
                             </div>
                             <div class="flex shrink-0 items-center gap-3 text-xs text-secondary">
-                                <span class="inline-flex items-center gap-1.5"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i>${p.comments}</span>
-                                <span class="inline-flex items-center gap-1.5"><i data-lucide="eye" class="w-3.5 h-3.5"></i>${p.views}</span>
+                                <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-comment text-[12px]"></i>${p.comments}</span>
+                                <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-eye text-[12px]"></i>${p.views}</span>
                             </div>
                         </div>
                     </div>
@@ -927,7 +808,7 @@
                 return `
                 <article class="card-item flex gap-4 p-4 sm:p-5">
                     <div class="tile shrink-0" style="background:${ad.bg};color:${ad.fg}">
-                        <i data-lucide="${ad.icon}" class="h-[22px] w-[22px]"></i>
+                        <i class="${ad.icon} text-[20px]"></i>
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2">
@@ -936,7 +817,7 @@
                         </div>
                         <p class="mt-2 text-sm leading-relaxed text-secondary">${ad.text}</p>
                         <a href="#" class="mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-primary underline decoration-border underline-offset-4 transition-colors hover:decoration-primary">
-                            Learn more <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            Learn more <i class="fa-solid fa-arrow-right text-[11px]"></i>
                         </a>
                     </div>
                 </article>`;
@@ -945,12 +826,12 @@
             const emptyState = `
                 <div class="rounded-xl border border-border bg-card px-6 py-16 text-center">
                     <div class="mx-auto grid h-11 w-11 place-items-center rounded-full border border-border text-secondary">
-                        <i data-lucide="search-x" class="w-5 h-5"></i>
+                        <i class="fa-solid fa-face-frown text-[20px]"></i>
                     </div>
                     <p class="mt-4 text-sm font-medium text-primary">No alternatives found</p>
                     <p class="mt-1 text-sm text-secondary">Try different keywords or clear the active filters.</p>
                     <button data-clear class="mt-5 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium text-primary transition-colors hover-surface">
-                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Clear filters
+                        <i class="fa-solid fa-rotate-left text-[13px]"></i> Clear filters
                     </button>
                 </div>`;
 
@@ -958,7 +839,7 @@
                 <article class="rounded-xl border border-dashed border-border p-6 text-center transition-colors hover:border-accent">
                     <p class="text-sm text-secondary">Know a great open source alternative that is not listed here?</p>
                     <a href="#" class="mt-3 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium text-primary transition-colors hover-surface">
-                        Submit an alternative <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                        Submit an alternative <i class="fa-solid fa-arrow-right i-arrow-up-right text-[12px]"></i>
                     </a>
                 </article>`;
 
@@ -999,7 +880,6 @@
                     requestAnimationFrame(() => requestAnimationFrame(() => listEl.classList.remove('no-anim')));
                 }
                 listEl.innerHTML = parts.join('');
-                if (window.lucide) lucide.createIcons();
 
                 const remaining = list.length - shown.length;
                 showMoreBtn.classList.toggle('hidden', remaining <= 0);
@@ -1020,7 +900,7 @@
                 $('newsList').innerHTML = NEWS.map(n => `
                     <a href="#" class="news-item group flex items-start gap-3 border-b border-border py-3 first:pt-2.5 last:border-b-0 last:pb-0">
                         <span class="news-tile" style="background:${n.bg};color:${n.fg}">
-                            <i data-lucide="${n.icon}" class="h-[17px] w-[17px]"></i>
+                            <i class="${n.icon} text-[15px]"></i>
                         </span>
                         <span class="min-w-0 flex-1">
                             <span class="line-clamp-2 block text-[13px] font-medium leading-snug text-primary transition-colors group-hover:text-accent">${n.title}</span>
@@ -1030,7 +910,7 @@
                                 <span class="shrink-0">${n.time}</span>
                             </span>
                         </span>
-                        <i data-lucide="arrow-up-right" class="mt-0.5 h-3.5 w-3.5 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100"></i>
+                        <i class="fa-solid fa-arrow-right i-arrow-up-right mt-0.5 shrink-0 text-[12px] text-secondary opacity-0 transition-opacity group-hover:opacity-100"></i>
                     </a>`).join('');
             }
 
@@ -1191,7 +1071,6 @@
             render();
             renderNews();
             animateStats();
-            if (window.lucide) lucide.createIcons();
         })();
     </script>
 </body>
