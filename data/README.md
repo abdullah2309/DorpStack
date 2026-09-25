@@ -1,12 +1,14 @@
 # DropStack data storage
 
-The admin panel is available at [`admin.html`](../admin.html).
+Admin panel (admin-only): [`admin.html`](../admin.html) — login `admin` / `admin_123`.
 
-When the first record is saved, the browser asks for the repository's `data/` directory. Grant read/write access once. The existing data manager then writes additions directly to:
+When the first **Save** is performed, the browser asks for the repository `data/` folder. Grant read/write once; the handle is cached in IndexedDB and future saves write directly to:
 
-- `data/alternatives.js` for projects and ads
-- `data/news.js` for news
+- `data/alternatives.js` for **Drops** (`products`) and **Ads** (`ads`)
+- `data/news.js` for **News**
 
-Use Chrome or Edge on desktop over `http://localhost` (for example, VS Code Live Server or `python -m http.server`). A static website cannot write to a GitHub repository remotely without a server-side GitHub token, so the browser File System Access API is used to write to the local checkout safely.
+All records support a **Link** field — public Drops, news and ad cards open that URL in a new tab (`js/card-links.js`).
 
-If the browser does not support direct folder access, the entry is retained in browser storage and the regular data manager's export fallback can be used.
+Use Chrome or Edge on desktop over `http://localhost` (e.g. VS Code Live Server or `python -m http.server`). A static site cannot push to GitHub without a server-side token, so the File System Access API writes to the local checkout. If unsupported, the panel keeps data in `localStorage` and offers an **Export .js** download to manually replace files in `data/`.
+
+The old public `data.html` has been removed — data is now admin-only.

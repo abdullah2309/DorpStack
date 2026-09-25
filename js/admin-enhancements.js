@@ -1,34 +1,25 @@
-/* Admin-only data panel enhancements.
- * Loaded by admin.html into the same-origin data manager frame.
- * Link values are kept with records and public card scripts can use `link`.
+/* DropStack admin enhancements — now integrated directly into admin.html.
+ * This file is kept for backward compatibility and does nothing when
+ * there is no embedded data manager frame. Admin link fields are handled
+ * natively in the professional admin panel (admin.html) for Drops, news
+ * and ads — each card opens its link in a new tab via js/card-links.js.
  */
 (function () {
   'use strict';
+  // If someone still loads an old data.html inside admin, redirect to admin.
+  if (location.pathname.endsWith('data.html')) {
+    location.replace('admin.html');
+    return;
+  }
   var frame = document.querySelector('.panel-frame');
   if (!frame) return;
+  // Legacy iframe path no longer used — hide frame and suggest admin.
   frame.addEventListener('load', function () {
     var doc = frame.contentDocument;
     if (!doc) return;
-    var style = doc.createElement('style');
-    style.textContent = '#exportBtn,#resetBtn{display:none!important}.admin-link-field{grid-column:1/-1}';
-    doc.head.appendChild(style);
-    var form = doc.getElementById('recForm');
-    if (!form) return;
-    var originalOpen = frame.contentWindow.openForm;
-    function addLinkField() {
-      var body = doc.getElementById('formBody');
-      if (!body || body.querySelector('#f_link')) return;
-      var field = doc.createElement('div');
-      field.className = 'admin-link-field';
-      field.innerHTML = '<label class="lbl">Link (opens in new tab)</label><input id="f_link" type="url" class="inp" placeholder="https://example.com">';
-      body.appendChild(field);
-    }
-    new MutationObserver(addLinkField).observe(doc.getElementById('formBody'), { childList:true, subtree:true });
-    form.addEventListener('submit', function () {
-      var link = doc.getElementById('f_link');
-      if (link && link.value.trim()) {
-        try { localStorage.setItem('dropstack-last-admin-link', link.value.trim()); } catch (e) {}
-      }
-    }, true);
+    var note = doc.createElement('div');
+    note.style.cssText = 'margin:12px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--secondary);font-size:12px';
+    note.textContent = 'This embedded manager is deprecated — please use admin.html directly.';
+    doc.body.prepend(note);
   });
 }());
