@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — DropStack</title>
+    <meta name="description" content="Learn about DropStack and its open source software directory.">
+    <meta name="theme-color" id="metaTheme" content="#0a1310">
+    <link rel="icon" href="assets/logo/iconlogo.png">
+
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('oa-theme') || 'dark';
+                var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (theme === 'dark' || (theme === 'system' && systemDark)) document.documentElement.classList.add('dark');
+            } catch (e) { document.documentElement.classList.add('dark'); }
+        })();
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Geist', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace']
+                    },
+                    colors: {
+                        background: 'var(--background)', card: 'var(--card)', popover: 'var(--popover)',
+                        border: 'var(--border)', primary: 'var(--foreground)',
+                        secondary: 'var(--secondary)', accent: 'var(--accent)'
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referencerpolicy="no-referrer">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-background text-primary font-sans antialiased min-h-screen flex flex-col">
+    <header class="site-header sticky top-0 z-40 w-full border-b border-border">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+            <div class="flex h-16 items-center justify-between gap-3">
+                <div class="flex items-center gap-7">
+                    <a href="index.html" class="flex items-center gap-2.5 text-[15px] font-semibold tracking-tight">
+                        <img src="assets/logo/logo-main-light.png" alt="DropStack logo" class="h-6 w-auto dark:hidden">
+                        <img src="assets/logo/logo-main-dark.png" alt="DropStack logo" class="hidden h-6 w-auto dark:block">
+                    </a>
+                    <nav class="hidden md:flex items-center gap-0.5 text-sm font-medium">
+                        <a href="projects.html" class="nav-link">Drops</a>
+                        <a href="news.html" class="nav-link">News</a>
+                        <a href="about.html" class="nav-link active">About</a>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="data.html" class="btn btn-outline hidden sm:inline-flex"><i class="fa-solid fa-database text-[12px]"></i> Manage data</a>
+                    <div class="theme-wrap relative" id="themeWrap">
+                        <button id="themeBtn" class="icon-btn" aria-label="Change theme" aria-haspopup="listbox" aria-expanded="false">
+                            <span id="tiSun" class="hidden"><i class="fa-solid fa-sun text-[15px]"></i></span>
+                            <span id="tiMoon"><i class="fa-solid fa-moon text-[15px]"></i></span>
+                            <span id="tiMonitor" class="hidden"><i class="fa-solid fa-desktop text-[15px]"></i></span>
+                        </button>
+                        <div class="theme-menu" id="themeMenu" role="listbox" aria-label="Appearance">
+                            <p class="px-2.5 pb-1 pt-1.5 text-[10px] font-semibold uppercase tracking-wider text-secondary">Appearance</p>
+                            <button class="theme-option" role="option" data-set-theme="light" aria-selected="false"><span><i class="fa-solid fa-sun text-[14px]"></i></span> Light<span class="check"><i class="fa-solid fa-check text-[12px]"></i></span></button>
+                            <button class="theme-option" role="option" data-set-theme="dark" aria-selected="false"><span><i class="fa-solid fa-moon text-[14px]"></i></span> Dark<span class="check"><i class="fa-solid fa-check text-[12px]"></i></span></button>
+                            <button class="theme-option" role="option" data-set-theme="system" aria-selected="false"><span><i class="fa-solid fa-desktop text-[14px]"></i></span> System<span class="check"><i class="fa-solid fa-check text-[12px]"></i></span></button>
+                        </div>
+                    </div>
+                    <button id="menuBtn" class="icon-btn md:hidden" aria-label="Toggle menu">
+                        <span id="miMenu"><i class="fa-solid fa-bars text-[15px]"></i></span>
+                        <span id="miClose" class="hidden"><i class="fa-solid fa-xmark text-[15px]"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="mobile-menu hidden border-t border-border md:hidden" data-shared-mobile-menu>
+            <nav class="mx-auto flex max-w-6xl flex-col gap-0.5 px-4 py-3 text-sm font-medium">
+                <a href="projects.html" class="nav-link">Drops</a>
+                <a href="news.html" class="nav-link">News</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="data.html" class="nav-link"><i class="fa-solid fa-database mr-2 text-[12px]"></i>Manage data</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <section class="page-hero">
+            <div class="grid-bg pointer-events-none" aria-hidden="true"></div>
+            <div class="relative mx-auto max-w-4xl px-4 sm:px-6">
+                <p class="page-eyebrow"><i class="fa-solid fa-circle-info"></i> ABOUT DROPSTACK</p>
+                <h1 class="mt-3 text-3xl font-bold tracking-[-0.03em] sm:text-5xl">Open source, without the noise.</h1>
+                <p class="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-secondary sm:text-base">DropStack helps people discover dependable open source alternatives to proprietary software. The directory stays simple, useful, and community driven.</p>
+            </div>
+        </section>
+
+        <section class="mx-auto max-w-4xl px-4 pb-20 sm:px-6">
+            <div class="grid gap-4 sm:grid-cols-3">
+                <article class="about-card">
+                    <span class="grid h-9 w-9 place-items-center rounded-lg border border-border text-accent"><i class="fa-solid fa-compass"></i></span>
+                    <h2 class="mt-4 text-sm font-semibold">Discover</h2>
+                    <p class="mt-2 text-xs leading-relaxed text-secondary">Find practical alternatives by project, category, license, and topic.</p>
+                </article>
+                <article class="about-card">
+                    <span class="grid h-9 w-9 place-items-center rounded-lg border border-border text-accent"><i class="fa-solid fa-code"></i></span>
+                    <h2 class="mt-4 text-sm font-semibold">Stay informed</h2>
+                    <p class="mt-2 text-xs leading-relaxed text-secondary">Follow product releases and meaningful updates from the open source community.</p>
+                </article>
+                <article class="about-card">
+                    <span class="grid h-9 w-9 place-items-center rounded-lg border border-border text-accent"><i class="fa-solid fa-heart"></i></span>
+                    <h2 class="mt-4 text-sm font-semibold">Support builders</h2>
+                    <p class="mt-2 text-xs leading-relaxed text-secondary">Better discovery gives independent maintainers and their projects more visibility.</p>
+                </article>
+            </div>
+
+            <div class="page-copy mt-12 rounded-2xl border border-border bg-card p-6 text-sm leading-relaxed text-secondary sm:p-8">
+                <h2 class="text-lg font-semibold text-primary">Our approach</h2>
+                <p>DropStack focuses on useful software that gives people real ownership, flexibility, and a path away from expensive proprietary tools. Every listing is managed from one simple data manager so the public site stays fast and easy to maintain.</p>
+                <p>Project information can be added and updated through the Data Manager. Published projects appear on the Projects page, while published news appears on the News page.</p>
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <a href="projects.html" class="btn btn-accent">Explore Drops <i class="fa-solid fa-arrow-right text-[12px]"></i></a>
+                    <a href="data.html" class="btn btn-outline">Open Data Manager</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-border">
+        <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-secondary sm:flex-row">
+            <p>© <span data-current-year>2026</span> DropStack</p>
+            <a href="index.html" class="hover:text-primary">Back to homepage</a>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

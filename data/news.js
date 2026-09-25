@@ -1,22 +1,11 @@
 /* ============================================================
-   DropStack — News data
+   DropStack — News data (saved 2026-09-25 00:09:30)
    File: data/news.js
-   ------------------------------------------------------------
-   Nayi news add karne ke liye bas ek nayi JSON line array
-   me append karo — sidebar automatically update ho jayega.
-   ------------------------------------------------------------
-   Fields:
-     id          : unique hex id
-     title       : news headline
-     source      : source/product name
-     time        : relative time ("2d ago")
-     created_at  : full timestamp
-     status      : "published" | "draft"
-     icon        : Font Awesome class
-     bg / fg     : logo tile colors
+   Managed via data.html — one JSON record per line
    ============================================================ */
 
 window.NEWS_DATA = [
+    {"id":"1a0d6c10b11ec","title":"aaaaaaaaaaaa","source":"aaaaaaaaaaa","time":"aaaaaaaa","created_at":"2026-09-25 00:09:13","status":"published","icon":"fa-solid fa-bolt","bg":"#fafafa","fg":"#dde4e0"},
     {"id":"6ab3a02b09f01","title":"Supabase launches Realtime Broadcast and Presence for multiplayer apps","source":"Supabase","time":"2d ago","created_at":"2025-01-20 10:00:00","status":"published","icon":"fa-solid fa-bolt","bg":"#3ecf8e","fg":"#03251a"},
     {"id":"6ab3a02b09f02","title":"Godot 4.4 is out: physics interpolation, embedded games and more","source":"Godot","time":"5d ago","created_at":"2025-01-17 15:30:00","status":"published","icon":"fa-solid fa-gamepad","bg":"#478cbf","fg":"#ffffff"},
     {"id":"6ab3a02b09f03","title":"Postiz raises $2M seed to take on Buffer and Hootsuite","source":"Postiz","time":"1w ago","created_at":"2025-01-13 09:15:00","status":"published","icon":"fa-solid fa-paper-plane","bg":"#b4e34a","fg":"#1f2900"},

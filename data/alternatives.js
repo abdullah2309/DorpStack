@@ -1,11 +1,15 @@
 /* ============================================================
-   DropStack — Alternatives & Ads data (exported 2026-09-24 00:06:24)
+   DropStack — Alternatives & Ads data (saved 2026-09-25 00:08:48)
    File: data/alternatives.js
+   Managed via data.html — one JSON record per line
    ============================================================ */
 
 window.ALTERNATIVES_DATA = {
 
     "products": [
+        {"id":"1a0d6bff3d97d","name":"11111111111111","github_url":"https://github.com/abdullah2309/","status":"active","level":1,"pricing":"Open Source","license":"asas","categories":["communication"],"description":"","topics":[],"votes":0,"comments":0,"views":"0","trending":50,"added":"2026-09-25","created_at":"2026-09-25 00:08:19","logo":{"bg":"#7ca28e","fg":"#7fb89b","icon":"fa-solid fa-bolt"},"altTo":[]},
+        {"id":"1a0d6967eed0a","name":"3333333333333","status":"active","level":1,"pricing":"Open Source","license":"33333333333333","categories":["developer-tools"],"description":"","topics":[],"votes":0,"comments":0,"views":"0","trending":50,"added":"2026-09-24","created_at":"2026-09-24 23:23:02","logo":{"bg":"#00a751","fg":"#000000","icon":"fa-solid fa-bolt"},"altTo":[{"name":"dfdf","bg":"#888888","fg":"#ffffff"}]},
+        {"id":"1a0d1a85fa791","name":"abdullah","status":"active","level":1,"pricing":"Open Source","license":"dfsdf","categories":["communication"],"description":"sdfdkfjkldsjfkldsfdsdsfasdf","topics":["dfdf"],"votes":0,"comments":0,"views":"0","trending":50,"added":"2026-09-24","created_at":"2026-09-24 00:24:27","logo":{"bg":"#72837a","fg":"#b4d025","icon":"fa-solid fa-bolt"},"altTo":[{"name":"dfsdfdfd","bg":"#888888","fg":"#ffffff"}]},
         {"id":"1a0d195f16fce","name":"sadasd","status":"active","level":1,"pricing":"Freemium","license":"dsadsad","categories":["developer-tools"],"description":"sadasdsd","topics":["aaaaaaaa"],"votes":23,"comments":32,"views":"4234","trending":50,"added":"2026-09-24","created_at":"2026-09-24 00:04:19","logo":{"bg":"#00a751","fg":"#00a751","icon":"fa-solid fa-bolt"},"altTo":[]},
         {"id":"1a0d1931b8391","name":"abdullah","status":"active","level":1,"pricing":"Freemium","license":"sda","categories":["productivity","developer-tools","analytics"],"description":"saddsdasdsadsadsd","topics":["sdasdasadas"],"votes":0,"comments":0,"views":"0","trending":50,"added":"2026-09-24","created_at":"2026-09-24 00:01:14","logo":{"bg":"#97d3b4","fg":"#a0aba6","icon":"fa-solid fa-bolt"},"altTo":[{"name":"aaaa","bg":"#888888","fg":"#ffffff"}]},
         {"id":"1a0d194367046","name":"abdullah (copy)","status":"active","level":1,"pricing":"Freemium","license":"sda","categories":["productivity","developer-tools","analytics"],"description":"saddsdasdsadsadsd","topics":["sdasdasadas"],"votes":0,"comments":0,"views":"0","trending":50,"added":"2026-09-24","created_at":"2026-09-24 00:02:26","logo":{"bg":"#97d3b4","fg":"#a0aba6","icon":"fa-solid fa-bolt"},"altTo":[{"name":"aaaa","bg":"#888888","fg":"#ffffff"}]},
@@ -28,6 +32,7 @@ window.ALTERNATIVES_DATA = {
     ],
 
     "ads": [
+        {"id":"1a0d6c066f1f4","status":"active","title":"aaaaaaaaaaa","bg":"#00a751","fg":"#00a751","icon":"fa-solid fa-bug","text":"aadad","created_at":"2026-09-25 00:08:48"},
         {"id":"6ab3a02b09fe1","status":"active","title":"CodeRabbit","bg":"#7b2fbe","fg":"#ffffff","icon":"fa-solid fa-bug","text":"The leading AI code review platform. Ship better quality code in 50% less time, with 90% fewer bugs."},
         {"id":"6ab3a02b09fe2","status":"active","title":"c15t","bg":"var(--accent)","fg":"#06130b","icon":"fa-solid fa-cookie","text":"Open-source cookie consent, built for control and lightning-fast modern web apps."},
         {"id":"6ab3a02b09fe2","status":"active","title":"c15t","bg":"var(--accent)","fg":"#06130b","icon":"fa-solid fa-cookie","text":"Open-source cookie consent, built for control and lightning-fast modern web apps."}
