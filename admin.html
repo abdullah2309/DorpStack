@@ -2,71 +2,70 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel — DropStack</title>
-  <meta name="description" content="DropStack admin panel for adding projects, news and ads.">
-  <link rel="icon" href="assets/logo/logo-main-light.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login — DropStack</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <script>
+    (function () { try { var t = localStorage.getItem('oa-theme') || 'dark'; if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); } catch (e) { document.documentElement.classList.add('dark'); } }());
+  </script>
   <style>
-    .admin-shell { min-height: 100vh; background: var(--background); color: var(--foreground); }
-    .admin-bar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px max(20px, calc((100vw - 1152px) / 2)); border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--background) 88%, transparent); backdrop-filter: blur(12px); }
-    .admin-brand { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
-    .admin-brand img { height: 25px; width: auto; }
-    .admin-badge { display: inline-flex; align-items: center; gap: 7px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: 999px; padding: 5px 10px; color: var(--accent); font: 600 11px "Geist Mono", monospace; }
-    .admin-badge i { font-size: 8px; }
-    .admin-intro { max-width: 1152px; margin: 0 auto; padding: 34px 20px 18px; }
-    .admin-intro h1 { margin: 0; font-size: clamp(25px, 4vw, 34px); letter-spacing: -.03em; }
-    .admin-intro p { max-width: 680px; margin: 9px 0 0; color: var(--secondary); font-size: 13px; line-height: 1.6; }
-    .admin-help { max-width: 1152px; margin: 0 auto 18px; padding: 0 20px; }
-    .admin-help-card { display: flex; gap: 11px; padding: 13px 15px; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 7%, var(--card)); color: var(--secondary); font-size: 12px; line-height: 1.55; }
-    .admin-help-card i { margin-top: 2px; color: var(--accent); }
-    .admin-frame { width: 100%; height: calc(100vh - 225px); min-height: 700px; border: 0; display: block; }
-    @media (max-width: 640px) { .admin-bar { padding: 12px 16px; } .admin-intro, .admin-help { padding-left: 16px; padding-right: 16px; } .admin-frame { height: calc(100vh - 245px); min-height: 760px; } }
+    .admin-auth { min-height:100vh; display:grid; place-items:center; padding:24px; background:var(--background); }
+    .auth-card { width:100%; max-width:420px; padding:32px; border:1px solid var(--border); border-radius:18px; background:var(--card); box-shadow:var(--geist-shadow); }
+    .auth-logo { display:block; height:30px; width:auto; margin:0 auto 24px; }
+    .auth-card h1 { margin:0; text-align:center; font-size:25px; letter-spacing:-.03em; }
+    .auth-card p { margin:8px 0 24px; color:var(--secondary); text-align:center; font-size:13px; }
+    .auth-label { display:block; margin:14px 0 6px; color:var(--secondary); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+    .auth-input { width:100%; height:42px; padding:0 12px; border:1px solid var(--border); border-radius:9px; background:var(--background); color:var(--foreground); outline:0; }
+    .auth-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent); }
+    .auth-submit { width:100%; height:42px; margin-top:22px; border:0; border-radius:9px; background:var(--accent); color:#06130b; font-weight:700; }
+    .auth-error { min-height:18px; margin-top:12px; color:#e5484d; font-size:12px; text-align:center; }
+    #adminPanel { display:none; min-height:100vh; background:var(--background); }
+    .panel-head { position:sticky; top:0; z-index:4; display:flex; justify-content:space-between; align-items:center; padding:13px max(16px,calc((100vw - 1152px)/2)); border-bottom:1px solid var(--border); background:color-mix(in srgb,var(--background) 90%,transparent); backdrop-filter:blur(12px); }
+    .panel-title { font-weight:700; font-size:14px; }
+    .panel-actions { display:flex; gap:8px; align-items:center; }
+    .panel-frame { width:100%; height:calc(100vh - 61px); min-height:760px; border:0; display:block; }
+    code { font-family:"Geist Mono",monospace; color:var(--accent); }
   </style>
+</head>
+<body>
+  <section id="login" class="admin-auth">
+    <form id="loginForm" class="auth-card" autocomplete="off">
+      <img src="assets/logo/logo-main-light.png" class="auth-logo dark:hidden" alt="DropStack">
+      <img src="assets/logo/logo-main-dark.png" class="auth-logo hidden dark:block" alt="DropStack">
+      <h1>Admin login</h1>
+      <p>Only admins can add Drops, news and ads.</p>
+      <label class="auth-label" for="username">Username</label>
+      <input class="auth-input" id="username" required autocomplete="username">
+      <label class="auth-label" for="password">Password</label>
+      <input class="auth-input" id="password" type="password" required autocomplete="current-password">
+      <button class="auth-submit" type="submit"><i class="fa-solid fa-lock-open"></i> Sign in</button>
+      <div id="loginError" class="auth-error" role="alert"></div>
+    </form>
+  </section>
+  <section id="adminPanel">
+    <header class="panel-head">
+      <a href="index.html" class="panel-title">DropStack / Admin Panel</a>
+      <div class="panel-actions"><span class="admin-badge" style="color:var(--accent);font:600 11px 'Geist Mono',monospace"><i class="fa-solid fa-circle"></i> ADMIN</span><button id="logout" class="btn btn-outline">Log out</button></div>
+    </header>
+    <iframe class="panel-frame" src="data.html" title="DropStack admin data panel"></iframe>
+  </section>
   <script>
     (function () {
-      try {
-        var t = localStorage.getItem('oa-theme') || 'dark';
-        if (t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
-      } catch (e) { document.documentElement.classList.add('dark'); }
-    })();
-  </script>
-</head>
-<body class="admin-shell">
-  <header class="admin-bar">
-    <a class="admin-brand" href="index.html" aria-label="Back to DropStack">
-      <img src="assets/logo/logo-main-light.png" alt="DropStack" class="dark:hidden">
-      <img src="assets/logo/logo-main-dark.png" alt="DropStack" class="hidden dark:block">
-      <span>Admin Panel</span>
-    </a>
-    <span class="admin-badge"><i class="fa-solid fa-circle"></i> DATA ENTRY</span>
-  </header>
-  <main>
-    <section class="admin-intro">
-      <h1>Add data to DropStack</h1>
-      <p>Use this panel to add projects, news and ads. On the first save, select the repository's <strong>data/</strong> folder; every later add is written automatically to the matching file in that folder.</p>
-    </section>
-    <section class="admin-help" aria-label="Storage instructions">
-      <div class="admin-help-card"><i class="fa-solid fa-folder-open"></i><span><strong>One-time setup:</strong> use Chrome or Edge on desktop, click Save, and choose <code>data/</code>. The panel writes to <code>data/alternatives.js</code> and <code>data/news.js</code>; if direct file access is unavailable, it keeps a browser backup and offers an export.</span></div>
-    </section>
-    <iframe class="admin-frame" src="data.html" title="DropStack data entry panel"></iframe>
-  </main>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js" crossorigin="anonymous"></script>
-  <script>
-    // Keep this entry point focused on data entry: hide destructive/edit actions in the embedded manager.
-    document.querySelector('.admin-frame').addEventListener('load', function () {
-      try {
-        var doc = this.contentDocument;
-        doc.title = 'Add Data — DropStack Admin';
-        doc.querySelectorAll('[data-act="edit"], [data-act="dup"], [data-act="del"], #resetBtn, #exportBtn').forEach(function (el) { el.style.display = 'none'; });
-        var style = doc.createElement('style');
-        style.textContent = '.row-btn[data-act="edit"],.row-btn[data-act="dup"],.row-btn[data-act="del"]{display:none!important}';
-        doc.head.appendChild(style);
-        new MutationObserver(function () {
-          doc.querySelectorAll('[data-act="edit"], [data-act="dup"], [data-act="del"], #resetBtn, #exportBtn').forEach(function (el) { el.style.display = 'none'; });
-        }).observe(doc.body, { childList: true, subtree: true });
-      } catch (e) { /* Same-origin is expected when served from this repository. */ }
-    });
+      'use strict';
+      var KEY = 'dropstack-admin-session';
+      var login = document.getElementById('login'), panel = document.getElementById('adminPanel');
+      function showPanel() { login.style.display='none'; panel.style.display='block'; }
+      if (sessionStorage.getItem(KEY) === '1') showPanel();
+      document.getElementById('loginForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var user = document.getElementById('username').value.trim();
+        var pass = document.getElementById('password').value;
+        if (user === 'admin' && pass === 'admin_123') { sessionStorage.setItem(KEY,'1'); showPanel(); }
+        else document.getElementById('loginError').textContent = 'Invalid username or password.';
+      });
+      document.getElementById('logout').addEventListener('click', function () { sessionStorage.removeItem(KEY); location.reload(); });
+    }());
   </script>
 </body>
 </html>
