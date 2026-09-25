@@ -22,6 +22,7 @@
                     return url.href;
                 } catch (e) { return ''; }
             };
+            const anyLink = (value) => { try { const u = new URL(String(value || '')); return /^https?:/.test(u.protocol) ? u.href : ''; } catch (e) { return ''; } };
 
             const LS = { alts: 'ds-edit-alternatives', news: 'ds-edit-news' };
             const loadLS = (k) => { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } };
@@ -35,7 +36,7 @@
             const state = { tab: 'alternatives', q: '', status: 'all', view: 'table' };
             const requestedTab = new URLSearchParams(window.location.search).get('tab');
             if (['alternatives', 'news', 'ads'].includes(requestedTab)) state.tab = requestedTab;
-            const TAB_LABELS = { alternatives: 'Project', news: 'News', ads: 'Ad' };
+            const TAB_LABELS = { alternatives: 'Drop', news: 'News', ads: 'Ad' };
             let editingId = null;
             let formTab = 'alternatives';
             let formPreviousFocus = null;
@@ -115,11 +116,11 @@
             function buildAlternativesFile() {
                 const p = DB.alternatives.products.map(r => JSON.stringify(r));
                 const a = DB.alternatives.ads.map(r => JSON.stringify(r));
-                return `/* ============================================================\n   DropStack — Alternatives & Ads data (saved ${nowStr()})\n   File: data/alternatives.js\n   Managed via data.html — one JSON record per line\n   ============================================================ */\n\nwindow.ALTERNATIVES_DATA = {\n\n    "products": [\n        ${p.join(',\n        ')}\n    ],\n\n    "ads": [\n        ${a.join(',\n        ')}\n    ]\n};\n`;
+                return `/* ============================================================\n   DropStack — Alternatives & Ads data (saved ${nowStr()})\n   File: data/alternatives.js\n   Managed via admin.html — one JSON record per line\n   ============================================================ */\n\nwindow.ALTERNATIVES_DATA = {\n\n    "products": [\n        ${p.join(',\n        ')}\n    ],\n\n    "ads": [\n        ${a.join(',\n        ')}\n    ]\n};\n`;
             }
             function buildNewsFile() {
                 const lines = DB.news.map(r => JSON.stringify(r));
-                return `/* ============================================================\n   DropStack — News data (saved ${nowStr()})\n   File: data/news.js\n   Managed via data.html — one JSON record per line\n   ============================================================ */\n\nwindow.NEWS_DATA = [\n    ${lines.join(',\n    ')}\n];\n`;
+                return `/* ============================================================\n   DropStack — News data (saved ${nowStr()})\n   File: data/news.js\n   Managed via admin.html — one JSON record per line\n   ============================================================ */\n\nwindow.NEWS_DATA = [\n    ${lines.join(',\n    ')}\n];\n`;
             }
 
             function parseDataFile(text) {
@@ -554,9 +555,9 @@
             function renderTable() {
                 const list = rows();
                 const heads = {
-                    alternatives: ['Project', 'ID', 'GitHub URL', 'Pricing', 'Categories', 'Votes', 'Status', 'Added', ''],
-                    news: ['News', 'ID', 'Source', 'Time', 'Status', 'Created', ''],
-                    ads: ['Ad', 'ID', 'Text', 'Status', '']
+                    alternatives: ['Drop', 'ID', 'GitHub URL', 'Pricing', 'Categories', 'Votes', 'Link', 'Status', 'Added', ''],
+                    news: ['News', 'ID', 'Source', 'Time', 'Link', 'Status', 'Created', ''],
+                    ads: ['Ad', 'ID', 'Text', 'Link', 'Status', '']
                 }[state.tab];
                 $('tableHead').innerHTML = '<tr>' + heads.map(h =>
                     `<th${h === '' ? ' style="text-align:right"' : ''}>${h}</th>`).join('') + '</tr>';
@@ -595,6 +596,7 @@
                                 <td class="text-secondary">${esc(r.pricing)}</td>
                                 <td><div class="flex max-w-[180px] flex-wrap gap-1">${cats}</div></td>
                                 <td class="mono font-semibold">${fmt(r.votes)}</td>
+                                <td class="link-cell">${anyLink(r.link) ? '<a href="'+esc(anyLink(r.link))+'" target="_blank" rel="noopener" class="text-accent hover:underline">'+esc(anyLink(r.link))+'</a>' : '<span style="color:var(--secondary)">—</span>'}</td>
                                 <td>${statusBadge(r)}</td>
                                 <td class="mono text-[11px] text-secondary">${shortDate(r.added)}</td>
                                 <td>${ACTIONS(r.id)}</td>
@@ -611,6 +613,7 @@
                                 <td class="mono text-[11px] text-secondary">${esc(r.id)}</td>
                                 <td class="text-secondary">${esc(r.source)}</td>
                                 <td class="mono text-[11px] text-secondary">${esc(r.time)}</td>
+                                <td class="link-cell">${anyLink(r.link) ? '<a href="'+esc(anyLink(r.link))+'" target="_blank" rel="noopener" class="text-accent">'+esc(anyLink(r.link))+'</a>' : '<span style="color:var(--secondary)">—</span>'}</td>
                                 <td>${statusBadge(r)}</td>
                                 <td class="mono text-[11px] text-secondary">${shortDate(r.created_at)}</td>
                                 <td>${ACTIONS(r.id)}</td>
@@ -625,6 +628,7 @@
                             </td>
                             <td class="mono text-[11px] text-secondary">${esc(r.id)}</td>
                             <td class="text-secondary" style="max-width:340px"><span class="line-clamp-2 block">${esc(r.text)}</span></td>
+                            <td class="link-cell">${anyLink(r.link) ? '<a href="'+esc(anyLink(r.link))+'" target="_blank" rel="noopener" class="text-accent">'+esc(anyLink(r.link))+'</a>' : '<span style="color:var(--secondary)">—</span>'}</td>
                             <td>${statusBadge(r)}</td>
                             <td>${ACTIONS(r.id)}</td>
                         </tr>`;
@@ -674,6 +678,7 @@
                     const cats = rec.categories || [];
                     html += cell(label('Name', 1) + inp('f_name', rec.name, 'Supabase'));
                     html += cell(label('GitHub URL') + inp('f_github', rec.github_url, 'https://github.com/username/project', 'url'), true);
+                    html += cell(label('Link (opens in new tab)') + inp('f_link', rec.link, 'https://example.com', 'url'), true);
                     html += cell(label('Pricing') + sel('f_pricing', ['Open Source', 'Freemium'], rec.pricing || 'Open Source'));
                     html += cell(label('License') + inp('f_license', rec.license, 'MIT, AGPL-3.0…'));
                     html += cell(label('Level') + num('f_level', rec.level ?? 1));
@@ -697,6 +702,7 @@
                     html += cell(label('Title', 1) + inp('f_title', rec.title, 'Supabase launches…'), true);
                     html += cell(label('Source', 1) + inp('f_source', rec.source, 'Supabase'));
                     html += cell(label('Relative time') + inp('f_time', rec.time, '2d ago'));
+                    html += cell(label('Link (opens in new tab)') + inp('f_link', rec.link, 'https://example.com', 'url'), true);
                     html += cell(label('Status') + sel('f_status', ['published', 'draft'], rec.status || 'published'));
                     html += cell(label('Tile background') + color('f_bg', rec.bg));
                     html += cell(label('Tile foreground') + color('f_fg', rec.fg));
@@ -706,6 +712,7 @@
                     html += cell(label('Title', 1) + inp('f_title', rec.title, 'CodeRabbit'));
                     html += cell(label('Status') + sel('f_status', ['active', 'draft'], rec.status || 'active'));
                     html += cell(label('Ad text') + ta('f_text', rec.text, 'Ad copy…'), true);
+                    html += cell(label('Link (opens in new tab)') + inp('f_link', rec.link, 'https://example.com', 'url'), true);
                     html += cell(label('Tile background') + color('f_bg', rec.bg));
                     html += cell(label('Tile foreground') + color('f_fg', rec.fg));
                     html += cell(label('Icon (Font Awesome class)') + iconField('f_icon', rec.icon || 'fa-solid fa-bug'), true);
@@ -780,6 +787,7 @@
                         id: editingId || genId(),
                         name: v('f_name'),
                         github_url: v('f_github') ? safeHttpUrl(v('f_github')) : '',
+                        link: v('f_link') ? (function(v){ try{ var u=new URL(String(v||'')); return /^https?:/.test(u.protocol)?u.href:'';}catch(e){return ''}})(v('f_link')) : '',
                         status: v('f_status') || 'active',
                         level: n('f_level', 1),
                         pricing: v('f_pricing') || 'Open Source',
@@ -806,6 +814,7 @@
                         title: v('f_title'),
                         source: v('f_source') || 'DropStack',
                         time: v('f_time') || 'just now',
+                        link: v('f_link') ? (function(v){ try{ var u=new URL(String(v||'')); return /^https?:/.test(u.protocol)?u.href:'';}catch(e){return ''}})(v('f_link')) : '',
                         created_at: v('f_created') || nowStr(),
                         status: v('f_status') || 'published',
                         icon: v('f_icon') || 'fa-solid fa-bolt',
@@ -822,6 +831,7 @@
                         fg: v('f_fg') || '#ffffff',
                         icon: v('f_icon') || 'fa-solid fa-bug',
                         text: v('f_text'),
+                        link: v('f_link') ? (function(v){ try{ var u=new URL(String(v||'')); return /^https?:/.test(u.protocol)?u.href:'';}catch(e){return ''}})(v('f_link')) : '',
                         created_at: (editingId && findRec(editingId, formTab) && findRec(editingId, formTab).created_at) || nowStr()
                     };
                 }
@@ -1002,7 +1012,7 @@
                         <span class="font-semibold text-primary">${missing.join(' aur ')} load nahi hua.</span>
                         file:// protocol ki wajah se ho sakta hai — project folder ko local server se kholo
                         (<span class="mono">VS Code Live Server</span> ya <span class="mono">python -m http.server</span>, phir
-                        <span class="mono">http://localhost:8000/data.html</span>). Ya check karo ki files sahi path par hain.
+                        <span class="mono">http://localhost:8000/admin.html</span>). Ya check karo ki files sahi path par hain.
                     </p>`;
                 document.querySelector('main .mx-auto').insertBefore(warn, $('modeNote'));
             }

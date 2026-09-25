@@ -39,8 +39,10 @@
                 const topics = p.topics.map(t => `<button class="topic" data-topic="${t}">#${t}</button>`).join('');
                 const github = DropStackUI.safeUrl(p.github_url);
 
+                var dLink=(function(v){ try{ var u=new URL(String(v||"")); return /^https?:/.test(u.protocol)?u.href:"";}catch(e){return "";}})(p.link);
+                var linkAttr=dLink?` data-external-link="${esc(dLink)}" style="cursor:pointer"`:"";
                 return `
-                <article id="project-${esc(p.id)}" data-project-id="${esc(p.id)}" class="card-item flex gap-4 p-4 sm:p-5" style="animation-delay:${delay}ms">
+                <article id="drop-${esc(p.id)}" data-drop-id="${esc(p.id)}" data-project-id="${esc(p.id)}" class="card-item flex gap-4 p-4 sm:p-5"${linkAttr} style="animation-delay:${delay}ms">
                     <div class="tile shrink-0" style="background:${p.logo.bg};color:${p.logo.fg}">
                         <i class="${p.logo.icon} text-[20px]"></i>
                     </div>
@@ -77,8 +79,12 @@
             }
 
             function adCard(ad) {
+                var link=(function(v){ try{ var u=new URL(String(v||"")); return /^https?:/.test(u.protocol)?u.href:"";}catch(e){return "";}})(ad.link);
+                var cardAttr=link?` data-external-link="${esc(link)}" style="cursor:pointer"`:"";
+                var href=link?esc(link):"#";
+                var target=link?` target="_blank" rel="noopener noreferrer"`:"";
                 return `
-                <article class="card-item flex gap-4 p-4 sm:p-5">
+                <article class="card-item flex gap-4 p-4 sm:p-5"${cardAttr}>
                     <div class="tile shrink-0" style="background:${ad.bg};color:${ad.fg}">
                         <i class="${ad.icon} text-[20px]"></i>
                     </div>
@@ -88,7 +94,7 @@
                             <span class="ad-pill">Ad</span>
                         </div>
                         <p class="mt-2 text-sm leading-relaxed text-secondary">${ad.text}</p>
-                        <a href="#" class="mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-primary underline decoration-border underline-offset-4 transition-colors hover:decoration-primary">
+                        <a href="${href}"${target} class="mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-primary underline decoration-border underline-offset-4 transition-colors hover:decoration-primary">
                             Learn more <i class="fa-solid fa-arrow-right text-[11px]"></i>
                         </a>
                     </div>
@@ -110,8 +116,8 @@
             const ctaCard = `
                 <article class="rounded-xl border border-dashed border-border p-6 text-center transition-colors hover:border-accent">
                     <p class="text-sm text-secondary">Know a great open source alternative that is not listed here?</p>
-                    <a href="data.html" class="mt-3 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium text-primary transition-colors hover-surface">
-                        Submit a project <i class="fa-solid fa-arrow-right i-arrow-up-right text-[12px]"></i>
+                    <a href="admin.html" class="mt-3 inline-flex items-center gap-1.5 rounded-md border border-border px-4 py-2 text-sm font-medium text-primary transition-colors hover-surface">
+                        Submit a Drop <i class="fa-solid fa-arrow-right i-arrow-up-right text-[12px]"></i>
                     </a>
                 </article>`;
 
@@ -169,8 +175,11 @@
 
             /* ================= Rendering: news sidebar ================= */
             function renderNews() {
-                $('newsList').innerHTML = NEWS.map(n => `
-                    <a href="#" class="news-item group flex items-start gap-3 border-b border-border py-3 first:pt-2.5 last:border-b-0 last:pb-0">
+                $('newsList').innerHTML = NEWS.map(n => {
+                    var href=(function(v){ try{ var u=new URL(String(v||"")); return /^https?:/.test(u.protocol)?u.href:"";}catch(e){return "";}})(n.link) || "#";
+                    var target=href!=="#"?' target="_blank" rel="noopener noreferrer"':"";
+                    return `
+                    <a href="${esc(href)}"${target} class="news-item group flex items-start gap-3 border-b border-border py-3 first:pt-2.5 last:border-b-0 last:pb-0">
                         <span class="news-tile" style="background:${n.bg};color:${n.fg}">
                             <i class="${n.icon} text-[15px]"></i>
                         </span>
@@ -183,7 +192,7 @@
                             </span>
                         </span>
                         <i class="fa-solid fa-arrow-right i-arrow-up-right mt-0.5 shrink-0 text-[12px] text-secondary opacity-0 transition-opacity group-hover:opacity-100"></i>
-                    </a>`).join('');
+                    </a>`; }).join('');
             }
 
             // Newsletter form
@@ -323,7 +332,7 @@
                         <span class="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[10px] text-secondary">${esc(item.license)}</span>
                     </button>`).join('') : `
                     <div class="search-empty">
-                        <div><i class="fa-solid fa-magnifying-glass mb-3 text-[20px]"></i><p class="text-sm font-medium text-primary">No projects found</p><p class="mt-1 text-xs">Try a different project, topic, or license.</p></div>
+                        <div><i class="fa-solid fa-magnifying-glass mb-3 text-[20px]"></i><p class="text-sm font-medium text-primary">No Drops found</p><p class="mt-1 text-xs">Try a different Drop, topic, or license.</p></div>
                     </div>`;
             }
 
@@ -351,7 +360,7 @@
                 render({ animate: false });
                 closeCommandSearch();
                 requestAnimationFrame(() => {
-                    const card = document.getElementById('project-' + id);
+                    const card = document.getElementById('drop-' + id) || document.getElementById('project-' + id);
                     if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 });
             }
